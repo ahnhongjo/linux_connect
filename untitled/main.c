@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
     if ((pmemaddr = pmem_map_file(argv[2],
                                   stbuf.st_size,
-                                  PMEM_FILE_CREATE|PMEM_FILE_EXCL,
+                                  PMEM_FILE_CREATE,
                                   0666, &mapped_len, &is_pmem)) == NULL) {
         perror("pmem_map_file");
         exit(1);
