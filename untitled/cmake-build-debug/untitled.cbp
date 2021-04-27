@@ -77,6 +77,9 @@
 		<Unit filename="C:/Users/HongJo/Desktop/linux_connect/untitled/main.c">
 			<Option target="untitled"/>
 		</Unit>
+		<Unit filename="C:/Users/HongJo/Desktop/linux_connect/untitled/read.c">
+			<Option target="untitled"/>
+		</Unit>
 		<Unit filename="C:/Users/HongJo/Desktop/linux_connect/untitled/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

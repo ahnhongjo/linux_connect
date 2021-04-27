@@ -57,40 +57,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #define MAX_BUF_LEN 30
 
 /****************************
- * This function writes the "Hello..." string to persistent-memory.
- *****************************/
-
-static void
-do_copy_to_pmem(char *pmemaddr, int srcfd, off_t len)
-{
-    char buf[BUF_LEN];
-    int cc;
-
-    /*
-     * Copy the file,
-     * saving the last flush & drain step to the end
-     */
-    while ((cc = read(srcfd, buf, BUF_LEN)) > 0) {
-        pmem_memcpy_nodrain(pmemaddr, buf, cc);
-        pmemaddr += cc;
-    }
-
-    if (cc < 0) {
-        perror("read");
-        exit(1);
-    }
-
-    /* Perform final flush step */
-    pmem_drain();
-}
-
-/****************************
  * This main function gather from the command line and call the appropriate
  * functions to perform read and write persistently to memory.
  *****************************/
 int main(int argc, char *argv[])
 {
-    char *path = argv[3];
+    char *path = argv[1];
     struct stat stbuf;
     char *pmemaddr;
     size_t mapped_len;
@@ -100,62 +72,20 @@ int main(int argc, char *argv[])
     // Create the string to save to persistent memory
     char buf[MAX_BUF_LEN] = "Hello Persistent Memory!!!";
 
-    if (argc != 4) {
+    if (argc != 2) {
         fprintf(stderr,
-                "usage: %s <-w/-r> src-file dst-file\n",
+                "usage: %s src-file\n",
                 argv[0]);
         exit(1);
     }
 
-    //write file to pmem
-    if (strcmp (argv[1], "-w") == 0) {
-
-        /* Open src-file */
-        if ((srcfd = open(argv[2], O_RDONLY)) < 0) {
-            perror(argv[1]);
-            exit(1);
-        }
-
-        /* Find the size of the src-file */
-        if (fstat(srcfd, &stbuf) < 0) {
-            perror("fstat");
-            exit(1);
-        }
-
-        /* create a pmem file and memory map it */
-        if ((pmemaddr = pmem_map_file(argv[3],
-                                      stbuf.st_size,
-                                      PMEM_FILE_CREATE|PMEM_FILE_EXCL,
-                                      0666, &mapped_len, &is_pmem)) == NULL) {
-            perror("pmem_map_file");
-            exit(1);
-        }
-
-        /*
- 	 * Determine if range is true pmem,
- 	 * call appropriate copy routine
- 	 * */
-        if (is_pmem)
-            do_copy_to_pmem(pmemaddr, srcfd,
-                            stbuf.st_size);
-
-        close(srcfd);
-        pmem_unmap(pmemaddr, mapped_len);
-
-        exit(0);
-
-
-
-        //read file from pmem
-    }   else if (strcmp (argv[1], "-r") == 0) {
-        /* open the pmem file to read back the data */
-        if ((pmemaddr = (char *)pmem_map_file(path, PMEM_LEN, PMEM_FILE_CREATE,
-                                              0666, &mapped_len, &is_pmem)) == NULL) {
-            perror("pmem_map_file");
-            exit(1);
-        }
-        /* Reading the string from persistent-memory and write to console */
-        printf("\n%s\n",pmemaddr);
+    if ((pmemaddr = (char *)pmem_map_file(path, PMEM_LEN, PMEM_FILE_CREATE,
+                                          0666, &mapped_len, &is_pmem)) == NULL) {
+        perror("pmem_map_file");
+        exit(1);
+    }
+    /* Reading the string from persistent-memory and write to console */
+    printf("\n%s\n",pmemaddr);
 
         return 0;
     }
