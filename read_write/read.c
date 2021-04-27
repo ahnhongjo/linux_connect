@@ -88,13 +88,4 @@ int main(int argc, char *argv[])
     printf("\n%c\n",pmemaddr[10]);
 
         return 0;
-    }
-
-
-
-    else {
-        fprintf(stderr, "Usage: %s <-w/-r> <filename>\n", argv[0]);
-        exit(1);
-    }
-
 }
