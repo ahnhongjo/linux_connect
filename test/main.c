@@ -98,10 +98,12 @@ void addVertex(Graph* g, Vertex* v) {
     v->index = g->vertexCount++;
 }
 
-void addEdge(Vertex* v, Edge* e) {
-    if (v == NULL || e == NULL) {
+void addEdge(Edge* e) {
+    if (e == NULL) {
         return;
     }
+
+    Vertex* v=e->from;
 
     Edge* eList = v->adjacencyList;
     if (eList == NULL) {
@@ -153,28 +155,43 @@ int main() {
     addVertex(g, v4);
     addVertex(g, v5);
 
-    addEdge(v1, createEdge(v1, v2, 0));
-    addEdge(v1, createEdge(v1, v3, 0));
-    addEdge(v1, createEdge(v1, v4, 0));
-    addEdge(v1, createEdge(v1, v5, 0));
+    addEdge(createEdge(v1, v2, 0));
+    addEdge(createEdge(v1, v3, 0));
+    addEdge(createEdge(v1, v4, 0));
+    addEdge(createEdge(v1, v5, 0));
 
-    addEdge(v2, createEdge(v2, v1, 0));
-    addEdge(v2, createEdge(v2, v3, 0));
-    addEdge(v2, createEdge(v2, v5, 0));
+    addEdge(createEdge(v2, v1, 0));
+    addEdge(createEdge(v2, v3, 0));
+    addEdge(createEdge(v2, v5, 0));
 
-    addEdge(v3, createEdge(v3, v1, 0));
-    addEdge(v3, createEdge(v3, v2, 0));
+    addEdge(createEdge(v3, v1, 0));
+    addEdge(createEdge(v3, v2, 0));
 
-    addEdge(v4, createEdge(v4, v1, 0));
-    addEdge(v4, createEdge(v4, v5, 0));
+    addEdge(createEdge(v4, v1, 0));
+    addEdge(createEdge(v4, v5, 0));
 
-    addEdge(v5, createEdge(v5, v1, 0));
-    addEdge(v5, createEdge(v5, v2, 0));
-    addEdge(v5, createEdge(v5, v4, 0));
+    addEdge(createEdge(v5, v1, 0));
+    addEdge(createEdge(v5, v2, 0));
+    addEdge(createEdge(v5, v4, 0));
 
     printGraph(g);
 
     destroyGraph(g);
+
+    FILE *fp;
+    fp = fopen("../graph.txt", "r");
+    if(fp == NULL){
+        printf("fail\n");
+    } else {
+        printf("success\n");
+    }
+    while (feof(fp) == 0) {
+        char str[100];
+        fgets(str, 100, fp);
+        printf("%s", str);
+    }
+
+    fclose(fp);
 
     return 0;
 }

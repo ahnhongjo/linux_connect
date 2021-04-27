@@ -50,7 +50,7 @@ Edge* createEdge(Vertex* from, Vertex* to, int weight);
 void destroyEdge(Edge* e);
 
 void addVertex(Graph* g, Vertex* v);
-void addEdge(Vertex* v, Edge* e);
+void addEdge(Edge* e);
 
 void printGraph(Graph* g);
 

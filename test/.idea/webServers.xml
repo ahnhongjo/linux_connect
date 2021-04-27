@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="9cf2e1e4-c53e-4c6f-86f4-cd22af94069a" name="ahj_alpha">
+        <fileTransfer rootFolder="/share/ahj" accessType="SFTP" host="202.30.29.136" port="22" sshConfigId="afdf281f-e4be-4c45-89e2-81460022a9de" sshConfig="ahj@202.30.29.136:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
