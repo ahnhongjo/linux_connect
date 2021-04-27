@@ -19,7 +19,52 @@
 
 int main(int argc, char *argv[]) {
 
+    int srcfd;
+    struct stat stbuf;
+    char *pmemaddr;
+    size_t mapped_len;
+    int is_pmem;
+
     printf("Hello, World!\n");
-    printf("%s",argv[0]);
+    printf("%s\n",argv[1]);
+    if (argc != 2) {
+        fprintf(stderr,
+                "usage: %s src-file\n",
+                argv[0]);
+        exit(1);
+    }
+
+    if ((pmemaddr = pmem_map_file(argv[2],
+                                  stbuf.st_size,
+                                  PMEM_FILE_CREATE|PMEM_FILE_EXCL,
+                                  0666, &mapped_len, &is_pmem)) == NULL) {
+        perror("pmem_map_file");
+        exit(1);
+    }
+
+    printf("%s\n");
+
+
+
+
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
