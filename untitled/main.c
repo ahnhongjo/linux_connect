@@ -107,6 +107,30 @@ void read_hello_string(char *path)
     return;
 }
 
+static void
+do_copy_to_pmem(char *pmemaddr, int srcfd, off_t len)
+{
+    char buf[BUF_LEN];
+    int cc;
+
+    /*
+     * Copy the file,
+     * saving the last flush & drain step to the end
+     */
+    while ((cc = read(srcfd, buf, BUF_LEN)) > 0) {
+        pmem_memcpy_nodrain(pmemaddr, buf, cc);
+        pmemaddr += cc;
+    }
+
+    if (cc < 0) {
+        perror("read");
+        exit(1);
+    }
+
+    /* Perform final flush step */
+    pmem_drain();
+}
+
 /****************************
  * This main function gather from the command line and call the appropriate
  * functions to perform read and write persistently to memory.
@@ -160,9 +184,6 @@ int main(int argc, char *argv[])
         if (is_pmem)
             do_copy_to_pmem(pmemaddr, srcfd,
                             stbuf.st_size);
-        else
-            do_copy_to_non_pmem(pmemaddr, srcfd,
-                                stbuf.st_size);
 
         close(srcfd);
         pmem_unmap(pmemaddr, mapped_len);
