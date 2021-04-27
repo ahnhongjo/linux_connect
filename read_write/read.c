@@ -51,7 +51,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define BUF_LEN 4096
 
 /* using 1k of pmem for this example */
-#define PMEM_LEN 1024
+#define PMEM_LEN 8192
 
 // Maximum length of our buffer
 #define MAX_BUF_LEN 30
