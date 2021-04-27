@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     }
 
     /* create a pmem file and memory map it */
-    if ((pmemaddr = pmem_map_file(argv[3],
+    if ((pmemaddr = pmem_map_file(argv[2],
                                   stbuf.st_size,
                                   PMEM_FILE_CREATE|PMEM_FILE_EXCL,
                                   0666, &mapped_len, &is_pmem)) == NULL) {

@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
     /* Reading the string from persistent-memory and write to console */
-    printf("\n%c\n",pmemaddr[10]);
+    printf("\n%s\n",pmemaddr);
 
         return 0;
 }
