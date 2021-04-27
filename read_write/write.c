@@ -90,81 +90,52 @@ do_copy_to_pmem(char *pmemaddr, int srcfd, off_t len)
  *****************************/
 int main(int argc, char *argv[])
 {
-    char *path = argv[3];
+    char *path = argv[2];
     struct stat stbuf;
     char *pmemaddr;
     size_t mapped_len;
     int srcfd;
     int is_pmem;
 
-    // Create the string to save to persistent memory
-    char buf[MAX_BUF_LEN] = "Hello Persistent Memory!!!";
-
-    if (argc != 4) {
+    if (argc != 3) {
         fprintf(stderr,
-                "usage: %s <-w/-r> src-file dst-file\n",
+                "usage: %s src-file dst-file\n",
                 argv[0]);
         exit(1);
     }
 
-    //write file to pmem
-    if (strcmp (argv[1], "-w") == 0) {
-
-        /* Open src-file */
-        if ((srcfd = open(argv[2], O_RDONLY)) < 0) {
-            perror(argv[1]);
-            exit(1);
-        }
-
-        /* Find the size of the src-file */
-        if (fstat(srcfd, &stbuf) < 0) {
-            perror("fstat");
-            exit(1);
-        }
-
-        /* create a pmem file and memory map it */
-        if ((pmemaddr = pmem_map_file(argv[3],
-                                      stbuf.st_size,
-                                      PMEM_FILE_CREATE|PMEM_FILE_EXCL,
-                                      0666, &mapped_len, &is_pmem)) == NULL) {
-            perror("pmem_map_file");
-            exit(1);
-        }
-
-        /*
- 	 * Determine if range is true pmem,
- 	 * call appropriate copy routine
- 	 * */
-        if (is_pmem)
-            do_copy_to_pmem(pmemaddr, srcfd,
-                            stbuf.st_size);
-
-        close(srcfd);
-        pmem_unmap(pmemaddr, mapped_len);
-
-        exit(0);
-
-
-
-        //read file from pmem
-    }   else if (strcmp (argv[1], "-r") == 0) {
-        /* open the pmem file to read back the data */
-        if ((pmemaddr = (char *)pmem_map_file(path, PMEM_LEN, PMEM_FILE_CREATE,
-                                              0666, &mapped_len, &is_pmem)) == NULL) {
-            perror("pmem_map_file");
-            exit(1);
-        }
-        /* Reading the string from persistent-memory and write to console */
-        printf("\n%s\n",pmemaddr);
-
-        return 0;
-    }
-
-
-
-    else {
-        fprintf(stderr, "Usage: %s <-w/-r> <filename>\n", argv[0]);
+    /* Open src-file */
+    if ((srcfd = open(argv[1], O_RDONLY)) < 0) {
+        perror(argv[1]);
         exit(1);
     }
+
+    /* Find the size of the src-file */
+    if (fstat(srcfd, &stbuf) < 0) {
+        perror("fstat");
+        exit(1);
+    }
+
+    /* create a pmem file and memory map it */
+    if ((pmemaddr = pmem_map_file(argv[3],
+                                  stbuf.st_size,
+                                  PMEM_FILE_CREATE|PMEM_FILE_EXCL,
+                                  0666, &mapped_len, &is_pmem)) == NULL) {
+        perror("pmem_map_file");
+        exit(1);
+    }
+
+    /*
+  * Determine if range is true pmem,
+  * call appropriate copy routine
+  * */
+    if (is_pmem)
+        do_copy_to_pmem(pmemaddr, srcfd,
+                        stbuf.st_size);
+
+    close(srcfd);
+    pmem_unmap(pmemaddr, mapped_len);
+
+    exit(0);
 
 }
