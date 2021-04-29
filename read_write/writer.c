@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <libpmemobj.h>
-#include "layout.h"
 
 #define LAYOUT_NAME "intro_0"
 #define MAX_BUF_LEN 10
