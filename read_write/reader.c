@@ -13,7 +13,22 @@ struct my_root {
 
 int main(int argc, char *argv[])
 {
-    PMEMobjpool *pop = pmemobj_open(argv[1], LAYOUT_NAME);
+
+    char* path=argv[1]
+    int n=strlen(argv[1]);
+
+    for(int i=0;i<n;i++){
+        char* tmp=""
+        if (path[i]=="/"){
+            printf("%s",tmp);
+            tmp="";
+        }
+        else{
+            strcat(tmp,path[i]);
+        }
+    }
+
+    PMEMobjpool *pop = pmemobj_open(path, LAYOUT_NAME);
     if (pop == NULL) {
         perror("pmemobj_open");
         return 1;
