@@ -1,0 +1,141 @@
+     1	/*
+     2	Copyright (c) 2018-2019 Intel Corporation
+     3	
+     4	Redistribution and use in source and binary forms, with or without modification,
+     5	are permitted provided that the following conditions are met:
+     6	 
+     7	1. Redistributions of source code must retain the above copyright notice,
+     8	   this list of conditions and the following disclaimer.
+     9	2. Redistributions in binary form must reproduce the above copyright notice,
+    10	   this list of conditions and the following disclaimer in the documentation
+    11	   and/or other materials provided with the distribution.
+    12	3. Neither the name of the copyright holder nor the names of its contributors
+    13	   may be used to endorse or promote products derived from this software
+    14	   without specific prior written permission.
+    15	 
+    16	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    17	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+    18	THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    19	ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS
+    20	BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    21	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+    22	OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+    23	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+    24	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+    25	OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+    26	EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    27	 
+    28	 
+    29	SPDX-License-Identifier: BSD-3-Clause
+    30	*/
+    31	
+    32	/*
+    33	 * hello_libpmem.c -- an example for libpmem library
+    34	 */
+    35	
+    36	#include <sys/types.h>
+    37	#include <sys/stat.h>
+    38	#include <fcntl.h>
+    39	#include <stdio.h>
+    40	#include <errno.h>
+    41	#include <stdlib.h>
+    42	#ifndef _WIN32
+    43	#include <unistd.h>
+    44	#else
+    45	#include <io.h>
+    46	#endif
+    47	#include <string.h>
+    48	#include <libpmem.h>
+    49	
+    50	/* Copying 4K at a time to pmem for this example */
+    51	#define BUF_LEN 4096
+    52	
+    53	/* using 1k of pmem for this example */
+    54	#define PMEM_LEN 1024
+    55	
+    56	// Maximum length of our buffer
+    57	#define MAX_BUF_LEN 30
+    58	
+    59	/****************************
+    60	 * This function writes the "Hello..." string to persistent-memory.
+    61	 *****************************/
+    62	
+    63	static void
+    64	do_copy_to_pmem(char *pmemaddr, int srcfd, off_t len)
+    65	{
+    66	    char buf[BUF_LEN];
+    67	    int cc;
+    68	
+    69	    /*
+    70	     * Copy the file,
+    71	     * saving the last flush & drain step to the end
+    72	     */
+    73	    while ((cc = read(srcfd, buf, BUF_LEN)) > 0) {
+    74	        pmem_memcpy_nodrain(pmemaddr, buf, cc);
+    75	        pmemaddr += cc;
+    76	    }
+    77	
+    78	    if (cc < 0) {
+    79	        perror("read");
+    80	        exit(1);
+    81	    }
+    82	
+    83	    /* Perform final flush step */
+    84	    pmem_drain();
+    85	}
+    86	
+    87	/****************************
+    88	 * This main function gather from the command line and call the appropriate
+    89	 * functions to perform read and write persistently to memory.
+    90	 *****************************/
+    91	int main(int argc, char *argv[])
+    92	{
+    93	    char *path = argv[2];
+    94	    struct stat stbuf;
+    95	    char *pmemaddr;
+    96	    size_t mapped_len;
+    97	    int srcfd;
+    98	    int is_pmem;
+    99	
+   100	    if (argc != 3) {
+   101	        fprintf(stderr,
+   102	                "usage: %s src-file dst-file\n",
+   103	                argv[0]);
+   104	        exit(1);
+   105	    }
+   106	
+   107	    /* Open src-file */
+   108	    if ((srcfd = open(argv[1], O_RDONLY)) < 0) {
+   109	        perror(argv[1]);
+   110	        exit(1);
+   111	    }
+   112	
+   113	    /* Find the size of the src-file */
+   114	    if (fstat(srcfd, &stbuf) < 0) {
+   115	        perror("fstat");
+   116	        exit(1);
+   117	    }
+   118	
+   119	    /* create a pmem file and memory map it */
+   120	    if ((pmemaddr = pmem_map_file(argv[2],
+   121	                                  stbuf.st_size,
+   122	                                  PMEM_FILE_CREATE|PMEM_FILE_EXCL,
+   123	                                  0666, &mapped_len, &is_pmem)) == NULL) {
+   124	        perror("pmem_map_file");
+   125	        exit(1);
+   126	    }
+   127	
+   128	    /*
+   129	  * Determine if range is true pmem,
+   130	  * call appropriate copy routine
+   131	  * */
+   132	    if (is_pmem)
+   133	        do_copy_to_pmem(pmemaddr, srcfd,
+   134	                        stbuf.st_size);
+   135	
+   136	    close(srcfd);
+   137	    pmem_unmap(pmemaddr, mapped_len);
+   138	
+   139	    exit(0);
+   140	
+   141	}

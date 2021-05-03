@@ -34,7 +34,7 @@
 
 .SUFFIXES: .lst
 
-all: read write listings
+all: read write reader writer listings
 
 listings: read.lst write.lst
 
@@ -42,10 +42,16 @@ listings: read.lst write.lst
 	expand -t 4 < $^ | cat -n > $@
 
 write: write.c
-    $(CC) -o write write.c -lpmem
+	$(CC) -o write write.c -lpmem
 
 read: read.c
-    $(CC) -o read read.c -lpmem
+	$(CC) -o read read.c -lpmem
+
+reader: reader.c
+	$(CC) -o reader reader.c -lpmemobj
+
+writer: writer.c
+	$(CC) -o writer writer.c -lpmemobj
 
 clean:
 	$(RM) *.o core a.out *.lst

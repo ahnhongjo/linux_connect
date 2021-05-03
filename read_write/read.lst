@@ -1,0 +1,91 @@
+     1	/*
+     2	Copyright (c) 2018-2019 Intel Corporation
+     3	
+     4	Redistribution and use in source and binary forms, with or without modification,
+     5	are permitted provided that the following conditions are met:
+     6	 
+     7	1. Redistributions of source code must retain the above copyright notice,
+     8	   this list of conditions and the following disclaimer.
+     9	2. Redistributions in binary form must reproduce the above copyright notice,
+    10	   this list of conditions and the following disclaimer in the documentation
+    11	   and/or other materials provided with the distribution.
+    12	3. Neither the name of the copyright holder nor the names of its contributors
+    13	   may be used to endorse or promote products derived from this software
+    14	   without specific prior written permission.
+    15	 
+    16	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    17	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+    18	THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    19	ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS
+    20	BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    21	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+    22	OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+    23	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+    24	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+    25	OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+    26	EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    27	 
+    28	 
+    29	SPDX-License-Identifier: BSD-3-Clause
+    30	*/
+    31	
+    32	/*
+    33	 * hello_libpmem.c -- an example for libpmem library
+    34	 */
+    35	
+    36	#include <sys/types.h>
+    37	#include <sys/stat.h>
+    38	#include <fcntl.h>
+    39	#include <stdio.h>
+    40	#include <errno.h>
+    41	#include <stdlib.h>
+    42	#ifndef _WIN32
+    43	#include <unistd.h>
+    44	#else
+    45	#include <io.h>
+    46	#endif
+    47	#include <string.h>
+    48	#include <libpmem.h>
+    49	
+    50	/* Copying 4K at a time to pmem for this example */
+    51	#define BUF_LEN 4096
+    52	
+    53	/* using 1k of pmem for this example */
+    54	#define PMEM_LEN 8192
+    55	
+    56	// Maximum length of our buffer
+    57	#define MAX_BUF_LEN 30
+    58	
+    59	/****************************
+    60	 * This main function gather from the command line and call the appropriate
+    61	 * functions to perform read and write persistently to memory.
+    62	 *****************************/
+    63	int main(int argc, char *argv[])
+    64	{
+    65	    char *path = argv[1];
+    66	    struct stat stbuf;
+    67	    char *pmemaddr;
+    68	    size_t mapped_len;
+    69	    int srcfd;
+    70	    int is_pmem;
+    71	
+    72	    // Create the string to save to persistent memory
+    73	    char buf[MAX_BUF_LEN] = "Hello Persistent Memory!!!";
+    74	
+    75	    if (argc != 2) {
+    76	        fprintf(stderr,
+    77	                "usage: %s src-file\n",
+    78	                argv[0]);
+    79	        exit(1);
+    80	    }
+    81	
+    82	    if ((pmemaddr = (char *)pmem_map_file(path, PMEM_LEN, PMEM_FILE_CREATE,
+    83	                                          0666, &mapped_len, &is_pmem)) == NULL) {
+    84	        perror("pmem_map_file");
+    85	        exit(1);
+    86	    }
+    87	    /* Reading the string from persistent-memory and write to console */
+    88	    printf("\n%s\n",pmemaddr);
+    89	
+    90	        return 0;
+    91	}
