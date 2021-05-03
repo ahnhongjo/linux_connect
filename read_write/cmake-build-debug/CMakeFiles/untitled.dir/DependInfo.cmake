@@ -4,10 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "C:/Users/HongJo/Desktop/linux_connect/untitled/main.c" "C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/CMakeFiles/untitled.dir/main.c.obj"
-  "C:/Users/HongJo/Desktop/linux_connect/untitled/read.c" "C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/CMakeFiles/untitled.dir/read.c.obj"
+  "C:/Users/HongJo/Desktop/linux_connect/read_write/read.c" "C:/Users/HongJo/Desktop/linux_connect/read_write/cmake-build-debug/CMakeFiles/untitled.dir/read.c.obj"
+  "C:/Users/HongJo/Desktop/linux_connect/read_write/write.c" "C:/Users/HongJo/Desktop/linux_connect/read_write/cmake-build-debug/CMakeFiles/untitled.dir/write.c.obj"
   )
-set(CMAKE_C_COMPILER_ID "GNU")
+set(CMAKE_C_COMPILER_ID "MSVC")
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH

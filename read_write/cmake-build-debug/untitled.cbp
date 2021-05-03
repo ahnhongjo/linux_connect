@@ -4,83 +4,91 @@
 	<Project>
 		<Option title="untitled"/>
 		<Option makefile_is_custom="1"/>
-		<Option compiler="gcc"/>
+		<Option compiler="msvc8"/>
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug"/>
+				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/read_write/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 all"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug"/>
+				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/read_write/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 edit_cache"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="untitled">
-				<Option output="C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/untitled.exe" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug"/>
+				<Option output="C:/Users/HongJo/Desktop/linux_connect/read_write/cmake-build-debug/untitled.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/read_write/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
-				<Option compiler="gcc"/>
+				<Option compiler="msvc8"/>
 				<Compiler>
-					<Add directory="C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include"/>
-					<Add directory="C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include-fixed"/>
-					<Add directory="C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/../../../../x86_64-w64-mingw32/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\cppwinrt"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 untitled"/>
-					<CompileFile command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 untitled"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="untitled/fast">
-				<Option output="C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/untitled.exe" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug"/>
+				<Option output="C:/Users/HongJo/Desktop/linux_connect/read_write/cmake-build-debug/untitled.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/read_write/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
-				<Option compiler="gcc"/>
+				<Option compiler="msvc8"/>
 				<Compiler>
-					<Add directory="C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include"/>
-					<Add directory="C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/include-fixed"/>
-					<Add directory="C:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/8.1.0/../../../../x86_64-w64-mingw32/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\cppwinrt"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 untitled/fast"/>
-					<CompileFile command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 untitled/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug"/>
+				<Option working_dir="C:/Users/HongJo/Desktop/linux_connect/read_write/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="C:/mingw64/bin/mingw32-make.exe -f &quot;C:/Users/HongJo/Desktop/linux_connect/untitled/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\HongJo\Desktop\linux_connect\read_write\cmake-build-debug\Makefile VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="C:/Users/HongJo/Desktop/linux_connect/untitled/main.c">
+		<Unit filename="C:/Users/HongJo/Desktop/linux_connect/read_write/read.c">
 			<Option target="untitled"/>
 		</Unit>
-		<Unit filename="C:/Users/HongJo/Desktop/linux_connect/untitled/read.c">
+		<Unit filename="C:/Users/HongJo/Desktop/linux_connect/read_write/write.c">
 			<Option target="untitled"/>
 		</Unit>
-		<Unit filename="C:/Users/HongJo/Desktop/linux_connect/untitled/CMakeLists.txt">
+		<Unit filename="C:/Users/HongJo/Desktop/linux_connect/read_write/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>
