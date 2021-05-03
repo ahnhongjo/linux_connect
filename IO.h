@@ -449,6 +449,13 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
             pmemobj_close(v_pool);
 
         } else {
+            free(offsets);
+            Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges);
+            return graph<vertex>(v, n, m, mem);
+        }
+
+
+        else {
             long m;
             long n;
             size_t size_inEdges, size_edges, size_v;
@@ -490,10 +497,6 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
         std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
         std::cout << "load time: " << sec.count() << std::endl;
 
-        return graph<vertex>(v, n, m, mem);
-    } else {
-        free(offsets);
-        Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges);
         return graph<vertex>(v, n, m, mem);
     }
 }
