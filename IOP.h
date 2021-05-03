@@ -194,7 +194,7 @@ graph<vertex> readGraphFromFile(char* fname, bool isSymmetric, bool mmap) {
 	//sslab: here!
 	system_clock::time_point start = system_clock::now();
 
-	PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/hamj/graph_data", "ligra-graph_data");
+	PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
 	PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
 	struct graph_data *gd_now = (struct graph_data *)pmemobj_direct(graph_data_root);
 	m = gd_now->m;
@@ -205,17 +205,17 @@ graph<vertex> readGraphFromFile(char* fname, bool isSymmetric, bool mmap) {
 	printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
 
 	printf("size_inEdges: %lu\n", size_inEdges);
-	PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/hamj/inEdges", "ligra-inEdges");
+	PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
 	PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
 	inEdges = (uintE *)pmemobj_direct(inEdges_root);
 
 	printf("size_edges: %lu\n", size_edges);
-	PMEMobjpool *edges_pool = pmemobj_open("/pmem/hamj/edges", "ligra-edges");
+	PMEMobjpool *edges_pool = pmemobj_open("/pmem/ahj/edges", "ligra-edges");
 	PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
 	edges = (uintE *)pmemobj_direct(edges_root);
 
 	printf("size_v: %lu\n", size_v);
-	PMEMobjpool *v_pool = pmemobj_open("/pmem/hamj/v", "ligra-v");
+	PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
 	PMEMoid v_root = pmemobj_root(v_pool, size_v);
 	v = (vertex *)pmemobj_direct(v_root);
 

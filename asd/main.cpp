@@ -17,5 +17,7 @@ int main() {
 
     printf("%s\n",ptr);
 
+    printf("%d",strlen(ptr));
+
     return 0;
 }
