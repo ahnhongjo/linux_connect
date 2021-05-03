@@ -192,7 +192,7 @@ graph<vertex> readGraphFromFile(char* fname, bool isSymmetric, bool mmap) {
 	uintE *edges;
 
 	//sslab: here!
-	system_clock::time_point start = system_clock::now();
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
 	PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
 	PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
@@ -221,10 +221,8 @@ graph<vertex> readGraphFromFile(char* fname, bool isSymmetric, bool mmap) {
 
 	Uncompressed_Mem<vertex>* mem = new Uncompressed_Mem<vertex>(v,n,m,edges,inEdges);
 
-	system_clock::time_point end = system_clock::now();
-	nanoseconds nano = end - start;
-
-	cout << "load time: " << nano.count() << endl;
+    std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
+    std::cout << "load time: " << sec.count() << std::endl;
 
 	return graph<vertex>(v,n,m,mem);
 }
