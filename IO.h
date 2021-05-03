@@ -471,9 +471,7 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
         uintE *edges;
 
         //sslab: here!
-        system_clock::time_point start = system_clock::now();
 
-        PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
         PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
         struct graph_data *gd_now = (struct graph_data *) pmemobj_direct(graph_data_root);
         m = gd_now->m;
