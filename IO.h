@@ -448,6 +448,13 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
             pmemobj_memcpy_persist(v_pool, pmemobj_direct(v_root), v, size_v);
             pmemobj_close(v_pool);
 
+            Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
+
+            std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
+            std::cout << "load time: " << sec.count() << std::endl;
+
+            return graph<vertex>(v, n, m, mem);
+
         } else {
             free(offsets);
             Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges);
@@ -455,42 +462,41 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
         }
 
 
-        else {
-            long m;
-            long n;
-            size_t size_inEdges, size_edges, size_v;
-            vertex *v;
-            uintE *inEdges;
-            uintE *edges;
+    } else {
+        long m;
+        long n;
+        size_t size_inEdges, size_edges, size_v;
+        vertex *v;
+        uintE *inEdges;
+        uintE *edges;
 
-            //sslab: here!
-            system_clock::time_point start = system_clock::now();
+        //sslab: here!
+        system_clock::time_point start = system_clock::now();
 
-            PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
-            PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
-            struct graph_data *gd_now = (struct graph_data *) pmemobj_direct(graph_data_root);
-            m = gd_now->m;
-            n = gd_now->n;
-            size_inEdges = gd_now->inEdges_size;
-            size_edges = gd_now->edges_size;
-            size_v = gd_now->v_size;
-            printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
+        PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
+        PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
+        struct graph_data *gd_now = (struct graph_data *) pmemobj_direct(graph_data_root);
+        m = gd_now->m;
+        n = gd_now->n;
+        size_inEdges = gd_now->inEdges_size;
+        size_edges = gd_now->edges_size;
+        size_v = gd_now->v_size;
+        printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
 
-            printf("size_inEdges: %lu\n", size_inEdges);
-            PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
-            PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
-            inEdges = (uintE *) pmemobj_direct(inEdges_root);
+        printf("size_inEdges: %lu\n", size_inEdges);
+        PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
+        PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
+        inEdges = (uintE *) pmemobj_direct(inEdges_root);
 
-            printf("size_edges: %lu\n", size_edges);
-            PMEMobjpool *edges_pool = pmemobj_open("/pmem/ahj/edges", "ligra-edges");
-            PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
-            edges = (uintE *) pmemobj_direct(edges_root);
+        printf("size_edges: %lu\n", size_edges);
+        PMEMobjpool *edges_pool = pmemobj_open("/pmem/ahj/edges", "ligra-edges");
+        PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
+        edges = (uintE *) pmemobj_direct(edges_root);
 
-            printf("size_v: %lu\n", size_v);
-            PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
-            PMEMoid v_root = pmemobj_root(v_pool, size_v);
-            v = (vertex *) pmemobj_direct(v_root);
-        }
+        printf("size_v: %lu\n", size_v);
+        PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
+        PMEMoid v_root = pmemobj_root(v_pool, size_v);
+        v = (vertex *) pmemobj_direct(v_root);
 
         Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
 
@@ -499,6 +505,7 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
 
         return graph<vertex>(v, n, m, mem);
     }
+
 }
 
 template<class vertex>
