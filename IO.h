@@ -427,7 +427,7 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
 
             printf("size_inEdges: %lu\n", size_inEdges);
 
-            inEdges_pool = pmemobj_create("/pmem/ahj/inEdges", "ligra-inEdges", size_inEdges + PMEMOBJ_MIN_POOL, 0666);
+            PMEMobjpool *inEdges_pool = pmemobj_create("/pmem/ahj/inEdges", "ligra-inEdges", size_inEdges + PMEMOBJ_MIN_POOL, 0666);
             PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
             pmemobj_memcpy_persist(inEdges_pool, pmemobj_direct(inEdges_root), inEdges, size_inEdges);
             pmemobj_close(inEdges_pool);
@@ -435,7 +435,7 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
 
             printf("size_edges: %lu\n", size_edges);
 
-            edges_pool = pmemobj_create("/pmem/ahj/edges", "ligra-edges", size_edges + PMEMOBJ_MIN_POOL, 0666);
+            PMEMobjpool *edges_pool = pmemobj_create("/pmem/ahj/edges", "ligra-edges", size_edges + PMEMOBJ_MIN_POOL, 0666);
             PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
             pmemobj_memcpy_persist(edges_pool, pmemobj_direct(edges_root), edges, size_edges);
             pmemobj_close(edges_pool);
@@ -443,7 +443,7 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
 
             printf("size_v: %lu\n", size_v);
 
-            v_pool = pmemobj_create("/pmem/ahj/v", "ligra-v", size_v + PMEMOBJ_MIN_POOL, 0666);
+            PMEMobjpool *v_pool = pmemobj_create("/pmem/ahj/v", "ligra-v", size_v + PMEMOBJ_MIN_POOL, 0666);
             PMEMoid v_root = pmemobj_root(v_pool, size_v);
             pmemobj_memcpy_persist(v_pool, pmemobj_direct(v_root), v, size_v);
             pmemobj_close(v_pool);
