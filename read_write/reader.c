@@ -8,7 +8,7 @@
 
 struct my_root {
     size_t len;
-    char buf[MAX_BUF_LEN];
+    int buf[MAX_BUF_LEN];
 };
 
 int main(int argc, char *argv[])
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     struct my_root *rootp = pmemobj_direct(root);
 
     if (rootp->len == strlen(rootp->buf))
-        printf("%s\n", rootp->buf);
+        printf("%d\n", rootp->buf[1]);
 
     pmemobj_close(pop);
 

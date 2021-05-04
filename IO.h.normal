@@ -338,68 +338,68 @@ graph<vertex> readGraphFromFile(char* fname, bool isSymmetric, bool mmap) {
 
     free(tOffsets);
     //sslab: here!
-//    size_t size_inEdges = m * sizeof(uintE);
-//    size_t size_edges = m * sizeof(uintE);
-//    size_t size_v = n * sizeof(vertex);
-//    size_t temp_size = 0;
-//
-//    PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/hamj/graph_data", "ligra-graph_data");
-//    if(!graph_data_pool) {
-//	    graph_data_pool = pmemobj_create("/pmem/hamj/graph_data", "ligra-graph_data", PMEMOBJ_MIN_POOL, 0666);
-//	    PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
-//	    struct graph_data *gd_tmp =(struct graph_data*) malloc(sizeof(struct graph_data));
-//	    gd_tmp->v_size = size_v;
-//	    gd_tmp->edges_size = size_edges;
-//	    gd_tmp->inEdges_size = size_inEdges;
-//	    gd_tmp->m = m;
-//	    gd_tmp->n = n;
-//	    pmemobj_memcpy_persist(graph_data_pool, pmemobj_direct(graph_data_root), gd_tmp, sizeof(struct graph_data));
-//	    memset(gd_tmp, 0, sizeof(struct graph_data));
-//	    memcpy(gd_tmp, pmemobj_direct(graph_data_root), sizeof(struct graph_data));
-//	    m = gd_tmp->m;
-//	    n = gd_tmp->n;
-//	    size_inEdges = gd_tmp->inEdges_size;
-//	    size_edges = gd_tmp->edges_size;
-//	    size_v = gd_tmp->v_size;
-//	    free(gd_tmp);
-//            pmemobj_close(graph_data_pool);
-//    }
-//
-//    printf("size_inEdges: %lu\n", size_inEdges);
-//    PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/hamj/inEdges", "ligra-inEdges");
-//    if(!inEdges_pool) {
-//	    //inEdges_pool = pmemobj_create("/pmem/hamj/inEdges", "ligra-inEdges", PMEMOBJ_MIN_POOL, 0666);
-//	    inEdges_pool = pmemobj_create("/pmem/hamj/inEdges", "ligra-inEdges", size_inEdges+PMEMOBJ_MIN_POOL, 0666);
-//	    PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
-//	    pmemobj_memcpy_persist(inEdges_pool, pmemobj_direct(inEdges_root), inEdges, size_inEdges);
-//	    memset(inEdges, 0, size_inEdges);
-//	    memcpy(inEdges, pmemobj_direct(inEdges_root), size_inEdges);
-//            pmemobj_close(inEdges_pool);
-//    }
-//
-//    printf("size_edges: %lu\n", size_edges);
-//    PMEMobjpool *edges_pool = pmemobj_open("/pmem/hamj/edges", "ligra-edges");
-//    if(!edges_pool) {
-//	    //edges_pool = pmemobj_create("/pmem/hamj/edges", "ligra-edges", PMEMOBJ_MIN_POOL, 0666);
-//	    edges_pool = pmemobj_create("/pmem/hamj/edges", "ligra-edges", size_edges+PMEMOBJ_MIN_POOL, 0666);
-//	    PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
-//	    pmemobj_memcpy_persist(edges_pool, pmemobj_direct(edges_root), edges, size_edges);
-//	    memset(edges, 0, size_edges);
-//	    memcpy(edges, pmemobj_direct(edges_root), size_edges);
-//            pmemobj_close(edges_pool);
-//    }
-//
-//    printf("size_v: %lu\n", size_v);
-//    PMEMobjpool *v_pool = pmemobj_open("/pmem/hamj/v", "ligra-v");
-//    if(!v_pool) {
-//	    //v_pool = pmemobj_create("/pmem/hamj/v", "ligra-v", PMEMOBJ_MIN_POOL, 0666);
-//	    v_pool = pmemobj_create("/pmem/hamj/v", "ligra-v", size_v+PMEMOBJ_MIN_POOL, 0666);
-//	    PMEMoid v_root = pmemobj_root(v_pool, size_v);
-//	    pmemobj_memcpy_persist(v_pool, pmemobj_direct(v_root), v, size_v);
-//	    memset(v, 0, size_v);
-//	    memcpy(v, pmemobj_direct(v_root), size_v);
-//            pmemobj_close(v_pool);
-//    }
+    size_t size_inEdges = m * sizeof(uintE);
+    size_t size_edges = m * sizeof(uintE);
+    size_t size_v = n * sizeof(vertex);
+    size_t temp_size = 0;
+
+    PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/hamj/graph_data", "ligra-graph_data");
+    if(!graph_data_pool) {
+	    graph_data_pool = pmemobj_create("/pmem/hamj/graph_data", "ligra-graph_data", PMEMOBJ_MIN_POOL, 0666);
+	    PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
+	    struct graph_data *gd_tmp =(struct graph_data*) malloc(sizeof(struct graph_data));
+	    gd_tmp->v_size = size_v;
+	    gd_tmp->edges_size = size_edges;
+	    gd_tmp->inEdges_size = size_inEdges;
+	    gd_tmp->m = m;
+	    gd_tmp->n = n;
+	    pmemobj_memcpy_persist(graph_data_pool, pmemobj_direct(graph_data_root), gd_tmp, sizeof(struct graph_data));
+	    memset(gd_tmp, 0, sizeof(struct graph_data));
+	    memcpy(gd_tmp, pmemobj_direct(graph_data_root), sizeof(struct graph_data));
+	    m = gd_tmp->m;
+	    n = gd_tmp->n;
+	    size_inEdges = gd_tmp->inEdges_size;
+	    size_edges = gd_tmp->edges_size;
+	    size_v = gd_tmp->v_size;
+	    free(gd_tmp);
+            pmemobj_close(graph_data_pool);
+    }
+
+    printf("size_inEdges: %lu\n", size_inEdges);
+    PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/hamj/inEdges", "ligra-inEdges");
+    if(!inEdges_pool) {
+	    //inEdges_pool = pmemobj_create("/pmem/hamj/inEdges", "ligra-inEdges", PMEMOBJ_MIN_POOL, 0666);
+	    inEdges_pool = pmemobj_create("/pmem/hamj/inEdges", "ligra-inEdges", size_inEdges+PMEMOBJ_MIN_POOL, 0666);
+	    PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
+	    pmemobj_memcpy_persist(inEdges_pool, pmemobj_direct(inEdges_root), inEdges, size_inEdges);
+	    memset(inEdges, 0, size_inEdges);
+	    memcpy(inEdges, pmemobj_direct(inEdges_root), size_inEdges);
+            pmemobj_close(inEdges_pool);
+    }
+
+    printf("size_edges: %lu\n", size_edges);
+    PMEMobjpool *edges_pool = pmemobj_open("/pmem/hamj/edges", "ligra-edges");
+    if(!edges_pool) {
+	    //edges_pool = pmemobj_create("/pmem/hamj/edges", "ligra-edges", PMEMOBJ_MIN_POOL, 0666);
+	    edges_pool = pmemobj_create("/pmem/hamj/edges", "ligra-edges", size_edges+PMEMOBJ_MIN_POOL, 0666);
+	    PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
+	    pmemobj_memcpy_persist(edges_pool, pmemobj_direct(edges_root), edges, size_edges);
+	    memset(edges, 0, size_edges);
+	    memcpy(edges, pmemobj_direct(edges_root), size_edges);
+            pmemobj_close(edges_pool);
+    }
+
+    printf("size_v: %lu\n", size_v);
+    PMEMobjpool *v_pool = pmemobj_open("/pmem/hamj/v", "ligra-v");
+    if(!v_pool) {
+	    //v_pool = pmemobj_create("/pmem/hamj/v", "ligra-v", PMEMOBJ_MIN_POOL, 0666);
+	    v_pool = pmemobj_create("/pmem/hamj/v", "ligra-v", size_v+PMEMOBJ_MIN_POOL, 0666);
+	    PMEMoid v_root = pmemobj_root(v_pool, size_v);
+	    pmemobj_memcpy_persist(v_pool, pmemobj_direct(v_root), v, size_v);
+	    memset(v, 0, size_v);
+	    memcpy(v, pmemobj_direct(v_root), size_v);
+            pmemobj_close(v_pool);
+    }
 
     Uncompressed_Mem<vertex>* mem = new Uncompressed_Mem<vertex>(v,n,m,edges,inEdges);
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;

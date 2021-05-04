@@ -8,7 +8,7 @@
 
 struct my_root {
     size_t len;
-    char buf[MAX_BUF_LEN];
+    int buf[MAX_BUF_LEN];
 };
 
 int main(int argc,char *argv[]){
@@ -21,9 +21,7 @@ int main(int argc,char *argv[]){
     PMEMoid root =pmemobj_root(pop,sizeof(struct my_root));
     struct my_root *rootp =pmemobj_direct(root);
 
-    char buf[MAX_BUF_LEN];
-    scanf("%9s",buf);
-
+    int buf[MAX_BUF_LEN]={1,2,3,4,5,6,7,8,9,10};
 
 
     rootp->len =strlen(buf);
