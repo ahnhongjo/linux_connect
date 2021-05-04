@@ -485,16 +485,19 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
         PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
         PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
         inEdges = (uintE *) pmemobj_direct(inEdges_root);
+        pmemobj_close(inEdges_pool);
 
         printf("size_edges: %lu\n", size_edges);
         PMEMobjpool *edges_pool = pmemobj_open("/pmem/ahj/edges", "ligra-edges");
         PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
         edges = (uintE *) pmemobj_direct(edges_root);
+        pmemobj_close(edges_pool);
 
         printf("size_v: %lu\n", size_v);
         PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
         PMEMoid v_root = pmemobj_root(v_pool, size_v);
         v = (vertex *) pmemobj_direct(v_root);
+        pmemobj_close(v_pool);
 
         Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
 
