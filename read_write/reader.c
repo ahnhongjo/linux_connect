@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
 
     if (rootp->len == strlen(rootp->buf))
         printf("%s\n", rootp->buf);
+
+    rootp->len=10;
     pmemobj_close(pop);
 
     return 0;

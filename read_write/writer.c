@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     rootp->len = strlen(buf);
     pmemobj_persist(pop, &rootp->len, sizeof (rootp->len));
-    pmemobj_memcpy_persist(pop, rootp->buf, my_buf, rootp->len);
+    pmemobj_memcpy_persist(pop, rootp->buf, buf, rootp->len);
 
     pmemobj_close(pop);
     return 0;
