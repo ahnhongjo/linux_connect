@@ -82,6 +82,8 @@ struct graph_data {
     size_t v_size;
     size_t edges_size;
     size_t inEdges_size;
+    size_t offsets_size;
+    size_t tOffsets_size;
     long m;
     long n;
 };
@@ -410,7 +412,10 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
             size_t size_inEdges = m * sizeof(uintE);
             size_t size_edges = m * sizeof(uintE);
             size_t size_v = n * sizeof(vertex);
-            size_t temp_size = 0;
+	    size_t size_offsets = n* sizeof(uintT);
+	    size_t size_tOffsets = n* sizeof(uintT);
+	    
+	    printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
 
             graph_data_pool = pmemobj_create("/pmem/ahj/graph_data", "ligra-graph_data", PMEMOBJ_MIN_POOL, 0666);
             PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
@@ -420,6 +425,9 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
             gd_tmp->inEdges_size = size_inEdges;
             gd_tmp->m = m;
             gd_tmp->n = n;
+	    gd_tmp->offsets_size=size_offsets;
+	    gd_tmp->tOffsets_size=size_tOffsets;
+
             pmemobj_memcpy_persist(graph_data_pool, pmemobj_direct(graph_data_root), gd_tmp, sizeof(struct graph_data));
             free(gd_tmp);
             pmemobj_close(graph_data_pool);
@@ -427,7 +435,7 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
 
             printf("size_inEdges: %lu\n", size_inEdges);
 
-            PMEMobjpool *inEdges_pool = pmemobj_create("/pmem/ahj/inEdges", "ligra-inEdges", size_inEdges + PMEMOBJ_MIN_POOL, 0666);
+            PMEMobjpool *inEdges_pool = pmemobj_create("/pmem/ahj/inEdges", "ligra-inEdges", size_inEdges+PMEMOBJ_MIN_POOL, 0666);
             PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
             pmemobj_memcpy_persist(inEdges_pool, pmemobj_direct(inEdges_root), inEdges, size_inEdges);
             pmemobj_close(inEdges_pool);
@@ -435,7 +443,7 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
 
             printf("size_edges: %lu\n", size_edges);
 
-            PMEMobjpool *edges_pool = pmemobj_create("/pmem/ahj/edges", "ligra-edges", size_edges + PMEMOBJ_MIN_POOL, 0666);
+            PMEMobjpool *edges_pool = pmemobj_create("/pmem/ahj/edges", "ligra-edges", size_edges+PMEMOBJ_MIN_POOL, 0666);
             PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
             pmemobj_memcpy_persist(edges_pool, pmemobj_direct(edges_root), edges, size_edges);
             pmemobj_close(edges_pool);
@@ -443,10 +451,21 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
 
             printf("size_v: %lu\n", size_v);
 
-            PMEMobjpool *v_pool = pmemobj_create("/pmem/ahj/v", "ligra-v", size_v + PMEMOBJ_MIN_POOL, 0666);
+            PMEMobjpool *v_pool = pmemobj_create("/pmem/ahj/v", "ligra-v", size_v+PMEMOBJ_MIN_POOL, 0666);
             PMEMoid v_root = pmemobj_root(v_pool, size_v);
             pmemobj_memcpy_persist(v_pool, pmemobj_direct(v_root), v, size_v);
             pmemobj_close(v_pool);
+
+
+	    PMEMobjpool *offsets_pool = pmemobj_create("/pmem/ahj/offsets", "ligra-offsets", size_offsets+PMEMOBJ_MIN_POOL, 0666);
+            PMEMoid offsets_root = pmemobj_root(offsets_pool, size_offsets);
+            pmemobj_memcpy_persist(offsets_pool, pmemobj_direct(offsets_root),offsets , size_offsets);
+            pmemobj_close(offsets_pool);
+
+	    PMEMobjpool *tOffsets_pool = pmemobj_create("/pmem/ahj/tOffsets", "ligra-tOffsets", size_tOffsets+PMEMOBJ_MIN_POOL, 0666);
+            PMEMoid tOffsets_root = pmemobj_root(tOffsets_pool, size_tOffsets);
+            pmemobj_memcpy_persist(tOffsets_pool, pmemobj_direct(tOffsets_root),tOffsets , size_tOffsets);
+            pmemobj_close(tOffsets_pool);
 
             Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
 
@@ -465,10 +484,12 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
     } else {
         long m;
         long n;
-        size_t size_inEdges, size_edges, size_v;
+        size_t size_inEdges, size_edges, size_v, size_offsets, size_tOffsets;
         vertex *v;
         uintE *inEdges;
         uintE *edges;
+	uintT *offsets;
+	uintT *tOffsets;
 
         //sslab: here!
 
@@ -479,30 +500,68 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
         size_inEdges = gd_now->inEdges_size;
         size_edges = gd_now->edges_size;
         size_v = gd_now->v_size;
+	size_offsets=gd_now->offsets_size;
+	size_tOffsets = gd_now->tOffsets_size;
         printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
 
         printf("size_inEdges: %lu\n", size_inEdges);
         PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
         PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
-        inEdges = (uintE *) pmemobj_direct(inEdges_root);
-        pmemobj_close(inEdges_pool);
+
+        //inEdges = (uintE *) pmemobj_direct(inEdges_root);
+	inEdges=newA(uintE,m);
+	memcpy(inEdges,pmemobj_direct(inEdges_root),size_inEdges);
 
         printf("size_edges: %lu\n", size_edges);
         PMEMobjpool *edges_pool = pmemobj_open("/pmem/ahj/edges", "ligra-edges");
         PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
-        edges = (uintE *) pmemobj_direct(edges_root);
-        pmemobj_close(edges_pool);
+
+	edges=newA(uintE,m);
+
+	memcpy(edges,pmemobj_direct(edges_root),size_edges);
+        //edges = (uintE *) pmemobj_direct(edges_root);
 
         printf("size_v: %lu\n", size_v);
         PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
         PMEMoid v_root = pmemobj_root(v_pool, size_v);
-        v = (vertex *) pmemobj_direct(v_root);
-        pmemobj_close(v_pool);
+
+
+	v=newA(vertex,n);
+	memcpy(v,pmemobj_direct(v_root),size_v);
+        //v = (vertex *) pmemobj_direct(v_root);
+	//
+	
+	PMEMobjpool *offsets_pool = pmemobj_open("/pmem/ahj/offsets","ligra-offsets");
+	PMEMoid offsets_root=pmemobj_root(offsets_pool,size_offsets);
+
+	offsets=newA(uintT,n);
+	memcpy(offsets,pmemobj_direct(offsets_root),size_offsets);
+
+
+
+	PMEMobjpool *tOffsets_pool = pmemobj_open("/pmem/ahj/tOffsets","ligra-tOffsets");
+	PMEMoid tOffsets_root=pmemobj_root(tOffsets_pool,size_tOffsets);
+
+	tOffsets=newA(uintT,n);
+	memcpy(tOffsets,pmemobj_direct(tOffsets_root,size_tOffsets);
+	
+	{parallel_for(uintT i=0;i<n;i++){
+		uintT o1 = offsets[i];
+		uintT o2 = tOffsets[i];
+		v[i].setOutNeighbors(edges+o1);
+		v[i].setInNeighbors(inEdges+o2);
+
+					}}
+	
+
+
+
 
         Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
 
         std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
         std::cout << "load time: " << sec.count() << std::endl;
+
 
         return graph<vertex>(v, n, m, mem);
     }
