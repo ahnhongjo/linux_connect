@@ -490,17 +490,8 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
         long n;
         size_t size_inEdges, size_edges, size_v, size_offsets, size_tOffsets;
         vertex *v;
-
-
-#ifndef WEIGHTED
-        uintE *inEdges;
-        uintE *edges;
-
-#else
-        intE* inEdges
-        intE* edges
-#endif
-
+        uintT* tOffsets = newA(uintT,n);
+        uintT* offsets = newA(uintT,n);
 
         //sslab: here!
 
@@ -561,7 +552,7 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
         PMEMoid tOffsets_root = pmemobj_root(tOffsets_pool, size_tOffsets);
 
         tOffsets = newA(uintT, n);
-        memcpy(tOffsets, pmemobj_direct(tOffsets_root, size_tOffsets);
+        memcpy(tOffsets, pmemobj_direct(tOffsets_root), size_tOffsets);
 
         parallel_for(uintT i = 0; i < n;i++){
                 uintT o1 = offsets[i];
