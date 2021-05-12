@@ -340,6 +340,14 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
                     }
                 }
             }
+
+            size_t size_offsets = n * sizeof(uintT);
+            PMEMobjpool *offsets_pool = pmemobj_create("/pmem/ahj/offsets", "ligra-offsets",
+                                                       size_offsets + PMEMOBJ_MIN_POOL, 0666);
+            PMEMoid offsets_root = pmemobj_root(offsets_pool, size_offsets);
+            pmemobj_memcpy_persist(offsets_pool, pmemobj_direct(offsets_root), offsets, size_offsets);
+            pmemobj_close(offsets_pool);
+
             free(offsets);
 
 #ifndef WEIGHTED
@@ -406,14 +414,22 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
                 }
             }
 
+            size_t size_tOffsets = n * sizeof(uintT);
+
+            PMEMobjpool *tOffsets_pool = pmemobj_create("/pmem/ahj/tOffsets", "ligra-tOffsets",
+                                                        size_tOffsets + PMEMOBJ_MIN_POOL, 0666);
+            PMEMoid tOffsets_root = pmemobj_root(tOffsets_pool, size_tOffsets);
+            pmemobj_memcpy_persist(tOffsets_pool, pmemobj_direct(tOffsets_root), tOffsets, size_tOffsets);
+            pmemobj_close(tOffsets_pool);
+
             free(tOffsets);
             //sslab: here!
 
             size_t size_inEdges = m * sizeof(uintE);
             size_t size_edges = m * sizeof(uintE);
             size_t size_v = n * sizeof(vertex);
-            size_t size_offsets = n * sizeof(uintT);
-            size_t size_tOffsets = n * sizeof(uintT);
+
+
 
             printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
 
@@ -457,19 +473,6 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
             PMEMoid v_root = pmemobj_root(v_pool, size_v);
             pmemobj_memcpy_persist(v_pool, pmemobj_direct(v_root), v, size_v);
             pmemobj_close(v_pool);
-
-
-            PMEMobjpool *offsets_pool = pmemobj_create("/pmem/ahj/offsets", "ligra-offsets",
-                                                       size_offsets + PMEMOBJ_MIN_POOL, 0666);
-            PMEMoid offsets_root = pmemobj_root(offsets_pool, size_offsets);
-            pmemobj_memcpy_persist(offsets_pool, pmemobj_direct(offsets_root), offsets, size_offsets);
-            pmemobj_close(offsets_pool);
-
-            PMEMobjpool *tOffsets_pool = pmemobj_create("/pmem/ahj/tOffsets", "ligra-tOffsets",
-                                                        size_tOffsets + PMEMOBJ_MIN_POOL, 0666);
-            PMEMoid tOffsets_root = pmemobj_root(tOffsets_pool, size_tOffsets);
-            pmemobj_memcpy_persist(tOffsets_pool, pmemobj_direct(tOffsets_root), tOffsets, size_tOffsets);
-            pmemobj_close(tOffsets_pool);
 
             Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
 
