@@ -172,11 +172,12 @@ words stringToWords(char *Str, long n) {
 template<class vertex>
 graph <vertex> readGraphFromFile(char *fname) {
 
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
 
     PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
 
     if (!graph_data_pool) {
+        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
         words W;
         _seq<char> S = readStringFromFile(fname);
@@ -420,93 +421,95 @@ graph <vertex> readGraphFromFile(char *fname) {
         return graph<vertex>(v, n, m, mem);
 
     } else {
-        long m;
-        long n;
-        size_t size_inEdges, size_edges, size_v, size_offsets, size_tOffsets;
-        vertex *v;
-        uintT *tOffsets;
-        uintT *offsets;
+        return graph_pmem<vertex>()
+    }
+}
 
-        //sslab: here!
+template<class vertex>
+graph_pmem<vertex>() {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+    
+    long m;
+    long n;
+    size_t size_inEdges, size_edges, size_v, size_offsets, size_tOffsets;
+    vertex *v;
+    uintT *tOffsets;
+    uintT *offsets;
 
-        PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
-        struct graph_data *gd_now = (struct graph_data *) pmemobj_direct(graph_data_root);
-        m = gd_now->m;
-        n = gd_now->n;
-        size_inEdges = gd_now->inEdges_size;
+    //sslab: here!
 
-        size_edges = gd_now->edges_size;
-        size_v = gd_now->v_size;
-        size_offsets = gd_now->offsets_size;
-        size_tOffsets = gd_now->tOffsets_size;
-        printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
+    PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
+    struct graph_data *gd_now = (struct graph_data *) pmemobj_direct(graph_data_root);
+    m = gd_now->m;
+    n = gd_now->n;
+    size_inEdges = gd_now->inEdges_size;
 
-        printf("size_inEdges: %lu\n", size_inEdges);
-        PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
-        PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
+    size_edges = gd_now->edges_size;
+    size_v = gd_now->v_size;
+    size_offsets = gd_now->offsets_size;
+    size_tOffsets = gd_now->tOffsets_size;
+    printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
 
-        //inEdges = (uintE *) pmemobj_direct(inEdges_root);
+    printf("size_inEdges: %lu\n", size_inEdges);
+    PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
+    PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
+
+    //inEdges = (uintE *) pmemobj_direct(inEdges_root);
 #ifndef WEIGHTED
-        uintE *inEdges = newA(uintE, m);
+    uintE *inEdges = newA(uintE, m);
 #else
-        intE* inEdges = newA(intE,2*m);
+    intE* inEdges = newA(intE,2*m);
 #endif
-        memcpy(inEdges, pmemobj_direct(inEdges_root), size_inEdges);
+    memcpy(inEdges, pmemobj_direct(inEdges_root), size_inEdges);
 
-        printf("size_edges: %lu\n", size_edges);
-        PMEMobjpool *edges_pool = pmemobj_open("/pmem/ahj/edges", "ligra-edges");
-        PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
+    printf("size_edges: %lu\n", size_edges);
+    PMEMobjpool *edges_pool = pmemobj_open("/pmem/ahj/edges", "ligra-edges");
+    PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
 
 #ifndef WEIGHTED
-        uintE *edges = newA(uintE, m);
+    uintE *edges = newA(uintE, m);
 #else
-        intE* edges = newA(intE,2*m);
+    intE* edges = newA(intE,2*m);
 #endif
 
-        memcpy(edges, pmemobj_direct(edges_root), size_edges);
-        //edges = (uintE *) pmemobj_direct(edges_root);
+    memcpy(edges, pmemobj_direct(edges_root), size_edges);
+    //edges = (uintE *) pmemobj_direct(edges_root);
 
-        printf("size_v: %lu\n", size_v);
-        PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
-        PMEMoid v_root = pmemobj_root(v_pool, size_v);
+    printf("size_v: %lu\n", size_v);
+    PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
+    PMEMoid v_root = pmemobj_root(v_pool, size_v);
 
+    v = newA(vertex, n);
+    memcpy(v, pmemobj_direct(v_root), size_v);
 
-        v = newA(vertex, n);
-        memcpy(v, pmemobj_direct(v_root), size_v);
-        //v = (vertex *) pmemobj_direct(v_root);
-        //
+    PMEMobjpool *offsets_pool = pmemobj_open("/pmem/ahj/offsets", "ligra-offsets");
+    PMEMoid offsets_root = pmemobj_root(offsets_pool, size_offsets);
 
-        PMEMobjpool *offsets_pool = pmemobj_open("/pmem/ahj/offsets", "ligra-offsets");
-        PMEMoid offsets_root = pmemobj_root(offsets_pool, size_offsets);
-
-        offsets = newA(uintT, n);
-        memcpy(offsets, pmemobj_direct(offsets_root), size_offsets);
+    offsets = newA(uintT, n);
+    memcpy(offsets, pmemobj_direct(offsets_root), size_offsets);
 
 
-        PMEMobjpool *tOffsets_pool = pmemobj_open("/pmem/ahj/tOffsets", "ligra-tOffsets");
-        PMEMoid tOffsets_root = pmemobj_root(tOffsets_pool, size_tOffsets);
+    PMEMobjpool *tOffsets_pool = pmemobj_open("/pmem/ahj/tOffsets", "ligra-tOffsets");
+    PMEMoid tOffsets_root = pmemobj_root(tOffsets_pool, size_tOffsets);
 
-        tOffsets = newA(uintT, n);
-        memcpy(tOffsets, pmemobj_direct(tOffsets_root), size_tOffsets);
+    tOffsets = newA(uintT, n);
+    memcpy(tOffsets, pmemobj_direct(tOffsets_root), size_tOffsets);
 
-        parallel_for(uintT
-        i = 0;
-        i < n;
-        i++){
-            uintT o1 = offsets[i];
-            uintT o2 = tOffsets[i];
-            v[i].setOutNeighbors(edges + o1);
-            v[i].setInNeighbors(inEdges + o2);
-        }
-
-        Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
-
-        std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
-        std::cout << "load time: " << sec.count() << std::endl;
-
-
-        return graph<vertex>(v, n, m, mem);
+    for (uintT i = 0; i < n; i++) {
+        uintT o1 = offsets[i];
+        uintT o2 = tOffsets[i];
+        v[i].setOutNeighbors(edges + o1);
+        v[i].setInNeighbors(inEdges + o2);
     }
 
+    Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
+
+    std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
+    std::cout << "load time: " << sec.count() << std::endl;
+
+    return graph<vertex>(v, n, m, mem);
+
 }
+
+
 
