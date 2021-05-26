@@ -226,7 +226,7 @@ graph <vertex> readGraphFromFile(char *fname) {
 #ifndef WEIGHTED
                 edges[i] = atol(W.Strings[i + n + 3]);
 #else
-                edges[2*i] = atol(W.Strings[i+n+3]);
+        edges[2*i] = atol(W.Strings[i+n+3]);
         edges[2*i+1] = atol(W.Strings[i+n+m+3]);
 #endif
             }
@@ -255,10 +255,7 @@ graph <vertex> readGraphFromFile(char *fname) {
 
         uintT *tOffsets = newA(uintT, n);
         {
-            parallel_for(long
-            i = 0;
-            i < n;
-            i++) tOffsets[i] = INT_T_MAX;
+            parallel_for(long i = 0; i < n; i++) tOffsets[i] = INT_T_MAX;
         }
 #ifndef WEIGHTED
         intPair *temp = newA(intPair, m);
@@ -266,10 +263,7 @@ graph <vertex> readGraphFromFile(char *fname) {
         intTriple* temp = newA(intTriple,m);
 #endif
         {
-            parallel_for(long
-            i = 0;
-            i < n;
-            i++){
+            parallel_for(long i = 0; i < n; i++){
                 uintT o = offsets[i];
                 for (uintT j = 0; j < v[i].getOutDegree(); j++) {
 #ifndef WEIGHTED
@@ -339,10 +333,7 @@ graph <vertex> readGraphFromFile(char *fname) {
         sequence::scanIBack(tOffsets, tOffsets, n, minF<uintT>(), (uintT) m);
 
         {
-            parallel_for(long
-            i = 0;
-            i < n;
-            i++){
+            parallel_for(long i = 0; i < n; i++){
                 uintT o = tOffsets[i];
                 uintT l = ((i == n - 1) ? m : tOffsets[i + 1]) - tOffsets[i];
                 v[i].setInDegree(l);
@@ -388,16 +379,12 @@ graph <vertex> readGraphFromFile(char *fname) {
         pmemobj_close(graph_data_pool);
 
 
-        printf("size_inEdges: %lu\n", size_inEdges);
-
         PMEMobjpool *inEdges_pool = pmemobj_create("/pmem/ahj/inEdges", "ligra-inEdges",
                                                    size_inEdges + PMEMOBJ_MIN_POOL, 0666);
         PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
         pmemobj_memcpy_persist(inEdges_pool, pmemobj_direct(inEdges_root), inEdges, size_inEdges);
         pmemobj_close(inEdges_pool);
 
-
-        printf("size_edges: %lu\n", size_edges);
 
         PMEMobjpool *edges_pool = pmemobj_create("/pmem/ahj/edges", "ligra-edges", size_edges + PMEMOBJ_MIN_POOL,
                                                  0666);
@@ -406,6 +393,8 @@ graph <vertex> readGraphFromFile(char *fname) {
         pmemobj_close(edges_pool);
 
 
+        printf("size_inEdges: %lu\n", size_inEdges);
+        printf("size_edges: %lu\n", size_edges);
         printf("size_v: %lu\n", size_v);
 
         PMEMobjpool *v_pool = pmemobj_create("/pmem/ahj/v", "ligra-v", size_v + PMEMOBJ_MIN_POOL, 0666);
@@ -429,42 +418,31 @@ template<class vertex>
 graph<vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    long m;
-    long n;
+    long m,n;
     size_t size_inEdges, size_edges, size_v, size_offsets, size_tOffsets;
     vertex *v;
     uintT *tOffsets;
     uintT *offsets;
 
     //sslab: here!
-
     PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
     struct graph_data *gd_now = (struct graph_data *) pmemobj_direct(graph_data_root);
     m = gd_now->m;
     n = gd_now->n;
     size_inEdges = gd_now->inEdges_size;
-
     size_edges = gd_now->edges_size;
     size_v = gd_now->v_size;
     size_offsets = gd_now->offsets_size;
     size_tOffsets = gd_now->tOffsets_size;
-    printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
 
-    printf("size_inEdges: %lu\n", size_inEdges);
-    PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
-    PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
+    printf("m : %lu, n : %lu, size_inEdges : %lu, size_edges : %lu, size_v : %lu\n", m, n, size_inEdges, size_edges, size_v);
 
-    //inEdges = (uintE *) pmemobj_direct(inEdges_root);
+
 #ifndef WEIGHTED
     uintE *inEdges = newA(uintE, m);
 #else
     intE* inEdges = newA(intE,2*m);
 #endif
-    memcpy(inEdges, pmemobj_direct(inEdges_root), size_inEdges);
-
-    printf("size_edges: %lu\n", size_edges);
-    PMEMobjpool *edges_pool = pmemobj_open("/pmem/ahj/edges", "ligra-edges");
-    PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
 
 #ifndef WEIGHTED
     uintE *edges = newA(uintE, m);
@@ -472,15 +450,23 @@ graph<vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
     intE* edges = newA(intE,2*m);
 #endif
 
-    memcpy(edges, pmemobj_direct(edges_root), size_edges);
-    //edges = (uintE *) pmemobj_direct(edges_root);
 
-    printf("size_v: %lu\n", size_v);
+    PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
+    PMEMoid inEdges_root = pmemobj_root(inEdges_pool, size_inEdges);
+    memcpy(inEdges, pmemobj_direct(inEdges_root), size_inEdges);
+
+
+    PMEMobjpool *edges_pool = pmemobj_open("/pmem/ahj/edges", "ligra-edges");
+    PMEMoid edges_root = pmemobj_root(edges_pool, size_edges);
+    memcpy(edges, pmemobj_direct(edges_root), size_edges);
+
+
     PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
     PMEMoid v_root = pmemobj_root(v_pool, size_v);
 
     v = newA(vertex, n);
     memcpy(v, pmemobj_direct(v_root), size_v);
+
 
     PMEMobjpool *offsets_pool = pmemobj_open("/pmem/ahj/offsets", "ligra-offsets");
     PMEMoid offsets_root = pmemobj_root(offsets_pool, size_offsets);
