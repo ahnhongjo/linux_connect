@@ -101,8 +101,9 @@ struct words {
         free(Strings);
     }
 };
+
 template<class vertex>
-graph<vertex> graph_pmem(PMEMobjpool *graph_data_pool);
+graph <vertex> graph_pmem(PMEMobjpool *graph_data_pool);
 
 inline bool isSpace(char c) {
     switch (c) {
@@ -134,23 +135,14 @@ _seq<char> readStringFromFile(char *fileName) {
 
 // parallel code for converting a string to words
 words stringToWords(char *Str, long n) {
-    {
-        parallel_for(long
-        i = 0;
-        i < n;
-        i++)
+    for (long i = 0; i < n; i++)
         if (isSpace(Str[i])) Str[i] = 0;
-    }
 
     // mark start of words
     bool *FL = newA(bool, n);
     FL[0] = Str[0];
-    {
-        parallel_for(long
-        i = 1;
-        i < n;
-        i++) FL[i] = Str[i] && !Str[i - 1];
-    }
+    for (long i = 1; i < n; i++)
+        FL[i] = Str[i] && !Str[i - 1];
 
     // offset for each start of word
     _seq<long> Off = sequence::packIndex<long>(FL, n);
@@ -159,12 +151,9 @@ words stringToWords(char *Str, long n) {
 
     // pointer to each start of word
     char **SA = newA(char * , m);
-    {
-        parallel_for(long
-        j = 0;
-        j < m;
-        j++) SA[j] = Str + offsets[j];
-    }
+
+    for (long j = 0; j < m; j++)
+        SA[j] = Str + offsets[j];
 
     free(offsets);
     free(FL);
@@ -185,7 +174,7 @@ graph <vertex> readGraphFromFile(char *fname) {
 #ifndef WEIGHTED
         if (W.Strings[0] != (string) "AdjacencyGraph") {
 #else
-            if (W.Strings[0] != (string) "WeightedAdjacencyGraph") {
+        if (W.Strings[0] != (string) "WeightedAdjacencyGraph") {
 #endif
             cout << "Bad input file" << endl;
             abort();
@@ -205,29 +194,22 @@ graph <vertex> readGraphFromFile(char *fname) {
 
         uintT *offsets = newA(uintT, n);
 #ifndef WEIGHTED
-        //sslab: here!
         uintE *edges = newA(uintE, m);
-        //printf("sizeof edges: %ld, m: %d\n", m * sizeof(uintE), m);
 #else
         intE* edges = newA(intE,2*m);
 #endif
 
+
+        for (long i = 0; i < n; i++)
+            offsets[i] = atol(W.Strings[i + 3]);
+
         {
-            parallel_for(long
-            i = 0;
-            i < n;
-            i++) offsets[i] = atol(W.Strings[i + 3]);
-        }
-        {
-            parallel_for(long
-            i = 0;
-            i < m;
-            i++) {
+            for (long i = 0; i < m;i++) {
 #ifndef WEIGHTED
                 edges[i] = atol(W.Strings[i + n + 3]);
 #else
-        edges[2*i] = atol(W.Strings[i+n+3]);
-        edges[2*i+1] = atol(W.Strings[i+n+m+3]);
+                edges[2*i] = atol(W.Strings[i+n+3]);
+                edges[2*i+1] = atol(W.Strings[i+n+m+3]);
 #endif
             }
         }
@@ -235,13 +217,9 @@ graph <vertex> readGraphFromFile(char *fname) {
 
         //sslab: here?
         vertex *v = newA(vertex, n);
-        //printf("sizeof vertex v: %ld, n: %d\n", n * sizeof(vertex), n);
 
         {
-            parallel_for(uintT
-            i = 0;
-            i < n;
-            i++) {
+            parallel_for(uintT i = 0; i < n; i++) {
                 uintT o = offsets[i];
                 uintT l = ((i == n - 1) ? m : offsets[i + 1]) - offsets[i];
                 v[i].setOutDegree(l);
@@ -255,7 +233,10 @@ graph <vertex> readGraphFromFile(char *fname) {
 
         uintT *tOffsets = newA(uintT, n);
         {
-            parallel_for(long i = 0; i < n; i++) tOffsets[i] = INT_T_MAX;
+            parallel_for(long
+            i = 0;
+            i < n;
+            i++) tOffsets[i] = INT_T_MAX;
         }
 #ifndef WEIGHTED
         intPair *temp = newA(intPair, m);
@@ -263,7 +244,10 @@ graph <vertex> readGraphFromFile(char *fname) {
         intTriple* temp = newA(intTriple,m);
 #endif
         {
-            parallel_for(long i = 0; i < n; i++){
+            parallel_for(long
+            i = 0;
+            i < n;
+            i++){
                 uintT o = offsets[i];
                 for (uintT j = 0; j < v[i].getOutDegree(); j++) {
 #ifndef WEIGHTED
@@ -415,10 +399,10 @@ graph <vertex> readGraphFromFile(char *fname) {
 }
 
 template<class vertex>
-graph<vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
+graph <vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-    long m,n;
+    long m, n;
     size_t size_inEdges, size_edges, size_v, size_offsets, size_tOffsets;
     vertex *v;
     uintT *tOffsets;
@@ -435,18 +419,15 @@ graph<vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
     size_offsets = gd_now->offsets_size;
     size_tOffsets = gd_now->tOffsets_size;
 
-    printf("m : %lu, n : %lu, size_inEdges : %lu, size_edges : %lu, size_v : %lu\n", m, n, size_inEdges, size_edges, size_v);
+    printf("m : %lu, n : %lu, size_inEdges : %lu, size_edges : %lu, size_v : %lu\n", m, n, size_inEdges, size_edges,
+           size_v);
 
 
 #ifndef WEIGHTED
     uintE *inEdges = newA(uintE, m);
-#else
-    intE* inEdges = newA(intE,2*m);
-#endif
-
-#ifndef WEIGHTED
     uintE *edges = newA(uintE, m);
 #else
+    intE* inEdges = newA(intE,2*m);
     intE* edges = newA(intE,2*m);
 #endif
 
