@@ -474,12 +474,8 @@ void Compute(hypergraph<vertex>&, commandLine);
 int parallel_main(int argc, char* argv[]) {
   commandLine P(argc,argv," [-s] <inFile>");
   char* iFile = P.getArgument(0);
-  bool symmetric = P.getOptionValue("-s");
-  bool compressed = P.getOptionValue("-c");
-  bool binary = P.getOptionValue("-b");
-  bool mmap = P.getOptionValue("-m");
   long rounds = P.getOptionLongValue("-rounds",3);
-  graph<asymmetricVertex> G = readGraphFromFile<asymmetricVertex>(iFile,symmetric,mmap); //asymmetric graph
+  graph<asymmetricVertex> G = readGraphFromFile<asymmetricVertex>(iFile); //asymmetric graph
     Compute(G,P);
     if(G.transposed) G.transpose();
     for(int r=0;r<rounds;r++) {
