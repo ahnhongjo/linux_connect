@@ -458,7 +458,6 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
             pmemobj_close(inEdges_pool);
 
 
-
             printf("size_edges: %lu\n", size_edges);
 
             PMEMobjpool *edges_pool = pmemobj_create("/pmem/ahj/edges", "ligra-edges", size_edges + PMEMOBJ_MIN_POOL,
@@ -494,8 +493,8 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
         long n;
         size_t size_inEdges, size_edges, size_v, size_offsets, size_tOffsets;
         vertex *v;
-        uintT* tOffsets;
-        uintT* offsets;
+        uintT* tOffsets = newA(uintT,n);
+        uintT* offsets = newA(uintT,n);
 
         //sslab: here!
 
@@ -504,7 +503,6 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
         m = gd_now->m;
         n = gd_now->n;
         size_inEdges = gd_now->inEdges_size;
-
         size_edges = gd_now->edges_size;
         size_v = gd_now->v_size;
         size_offsets = gd_now->offsets_size;
