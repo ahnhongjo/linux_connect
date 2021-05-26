@@ -101,6 +101,8 @@ struct words {
         free(Strings);
     }
 };
+template<class vertex>
+graph<vertex> graph_pmem();
 
 inline bool isSpace(char c) {
     switch (c) {
@@ -171,8 +173,6 @@ words stringToWords(char *Str, long n) {
 
 template<class vertex>
 graph <vertex> readGraphFromFile(char *fname) {
-
-
 
     PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
 
@@ -421,14 +421,14 @@ graph <vertex> readGraphFromFile(char *fname) {
         return graph<vertex>(v, n, m, mem);
 
     } else {
-        return graph_pmem<vertex>()
+        return graph_pmem<vertex>();
     }
 }
 
 template<class vertex>
-graph_pmem<vertex>() {
+graph<vertex> graph_pmem() {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-    
+
     long m;
     long n;
     size_t size_inEdges, size_edges, size_v, size_offsets, size_tOffsets;
@@ -438,6 +438,7 @@ graph_pmem<vertex>() {
 
     //sslab: here!
 
+    PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
     PMEMoid graph_data_root = pmemobj_root(graph_data_pool, sizeof(struct graph_data));
     struct graph_data *gd_now = (struct graph_data *) pmemobj_direct(graph_data_root);
     m = gd_now->m;
