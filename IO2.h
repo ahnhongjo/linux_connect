@@ -520,9 +520,3 @@ graph <vertex> readGraphFromFile(char *fname, bool isSymmetric, bool mmap) {
     }
 
 }
-
-template<class vertex>
-graph <vertex> readGraph(char *iFile, bool compressed, bool symmetric, bool binary, bool mmap) {
-    if (binary) return readGraphFromBinary<vertex>(iFile, symmetric);
-    else return readGraphFromFile<vertex>(iFile, symmetric, mmap);
-}

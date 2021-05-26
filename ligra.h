@@ -247,7 +247,7 @@ vertexSubsetData<data> edgeMapData(graph<vertex>& GA, VS &vs, F f,
   uintT* degrees = NULL;
   vertex* frontierVertices = NULL;
   uintT outDegrees = 0;
-  if(threshold > 0) { //compute sum of out-degrees if threshold > 0 
+  if(threshold > 0) { //compute sum of out-degrees if threshold > 0
     vs.toSparse();
     degrees = newA(uintT, m);
     frontierVertices = newA(vertex,m);
@@ -480,74 +480,15 @@ int parallel_main(int argc, char* argv[]) {
   bool mmap = P.getOptionValue("-m");
   //cout << "mmap = " << mmap << endl;
   long rounds = P.getOptionLongValue("-rounds",3);
-  if (compressed) {
-    if (symmetric) {
-#ifndef HYPER
-      graph<compressedSymmetricVertex> G =
-        readCompressedGraph<compressedSymmetricVertex>(iFile,symmetric,mmap); //symmetric graph
-#else
-      hypergraph<compressedSymmetricVertex> G =
-        readCompressedHypergraph<compressedSymmetricVertex>(iFile,symmetric,mmap); //symmetric graph
-#endif
-      Compute(G,P);
-      for(int r=0;r<rounds;r++) {
-        startTime();
-        Compute(G,P);
-        nextTime("Running time");
-      }
-      G.del();
-    } else {
-#ifndef HYPER
-      graph<compressedAsymmetricVertex> G =
-        readCompressedGraph<compressedAsymmetricVertex>(iFile,symmetric,mmap); //asymmetric graph
-#else
-      hypergraph<compressedAsymmetricVertex> G =
-        readCompressedHypergraph<compressedAsymmetricVertex>(iFile,symmetric,mmap); //asymmetric graph
-#endif
-      Compute(G,P);
-      if(G.transposed) G.transpose();
-      for(int r=0;r<rounds;r++) {
+  graph<asymmetricVertex> G = readGraphFromFile<asymmetricVertex>(iFile,compressed,symmetric,binary,mmap); //asymmetric graph
+    Compute(G,P);
+    if(G.transposed) G.transpose();
+    for(int r=0;r<rounds;r++) {
         startTime();
         Compute(G,P);
         nextTime("Running time");
         if(G.transposed) G.transpose();
-      }
-      G.del();
     }
-  } else {
-    if (symmetric) {
-#ifndef HYPER
-      graph<symmetricVertex> G =
-        readGraph<symmetricVertex>(iFile,compressed,symmetric,binary,mmap); //symmetric graph
-#else
-      hypergraph<symmetricVertex> G =
-        readHypergraph<symmetricVertex>(iFile,compressed,symmetric,binary,mmap); //symmetric graph
-#endif
-      Compute(G,P);
-      for(int r=0;r<rounds;r++) {
-        startTime();
-        Compute(G,P);
-        nextTime("Running time");
-      }
-      G.del();
-    } else {
-#ifndef HYPER
-      graph<asymmetricVertex> G =
-        readGraph<asymmetricVertex>(iFile,compressed,symmetric,binary,mmap); //asymmetric graph
-#else
-      hypergraph<asymmetricVertex> G =
-        readHypergraph<asymmetricVertex>(iFile,compressed,symmetric,binary,mmap); //asymmetric graph
-#endif
-      Compute(G,P);
-      if(G.transposed) G.transpose();
-      for(int r=0;r<rounds;r++) {
-        startTime();
-        Compute(G,P);
-        nextTime("Running time");
-        if(G.transposed) G.transpose();
-      }
-      G.del();
-    }
-  }
+    G.del();
 }
 #endif
