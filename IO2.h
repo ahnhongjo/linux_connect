@@ -174,7 +174,7 @@ graph <vertex> readGraphFromFile(char *fname) {
 #ifndef WEIGHTED
         if (W.Strings[0] != (string) "AdjacencyGraph") {
 #else
-        if (W.Strings[0] != (string) "WeightedAdjacencyGraph") {
+            if (W.Strings[0] != (string) "WeightedAdjacencyGraph") {
 #endif
             cout << "Bad input file" << endl;
             abort();
@@ -204,7 +204,7 @@ graph <vertex> readGraphFromFile(char *fname) {
             offsets[i] = atol(W.Strings[i + 3]);
 
         {
-            for (long i = 0; i < m;i++) {
+            for (long i = 0; i < m; i++) {
 #ifndef WEIGHTED
                 edges[i] = atol(W.Strings[i + n + 3]);
 #else
@@ -219,7 +219,7 @@ graph <vertex> readGraphFromFile(char *fname) {
         vertex *v = newA(vertex, n);
 
         {
-            parallel_for(uintT i = 0; i < n; i++) {
+            for (uintT i = 0; i < n; i++) {
                 uintT o = offsets[i];
                 uintT l = ((i == n - 1) ? m : offsets[i + 1]) - offsets[i];
                 v[i].setOutDegree(l);
@@ -233,10 +233,8 @@ graph <vertex> readGraphFromFile(char *fname) {
 
         uintT *tOffsets = newA(uintT, n);
         {
-            parallel_for(long
-            i = 0;
-            i < n;
-            i++) tOffsets[i] = INT_T_MAX;
+            for (long i = 0; i < n; i++)
+                tOffsets[i] = INT_T_MAX;
         }
 #ifndef WEIGHTED
         intPair *temp = newA(intPair, m);
@@ -244,10 +242,7 @@ graph <vertex> readGraphFromFile(char *fname) {
         intTriple* temp = newA(intTriple,m);
 #endif
         {
-            parallel_for(long
-            i = 0;
-            i < n;
-            i++){
+            for (long i = 0; i < n; i++) {
                 uintT o = offsets[i];
                 for (uintT j = 0; j < v[i].getOutDegree(); j++) {
 #ifndef WEIGHTED
@@ -294,10 +289,7 @@ graph <vertex> readGraphFromFile(char *fname) {
         inEdges[1] = temp[0].second.second;
 #endif
         {
-            parallel_for(long
-            i = 1;
-            i < m;
-            i++) {
+            for (long i = 1; i < m; i++) {
 #ifndef WEIGHTED
                 inEdges[i] = temp[i].second;
 #else
@@ -317,7 +309,7 @@ graph <vertex> readGraphFromFile(char *fname) {
         sequence::scanIBack(tOffsets, tOffsets, n, minF<uintT>(), (uintT) m);
 
         {
-            parallel_for(long i = 0; i < n; i++){
+            for (long i = 0; i < n; i++) {
                 uintT o = tOffsets[i];
                 uintT l = ((i == n - 1) ? m : tOffsets[i + 1]) - tOffsets[i];
                 v[i].setInDegree(l);
