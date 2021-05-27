@@ -436,14 +436,12 @@ graph <vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
 
     PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
     PMEMoid v_root = pmemobj_root(v_pool, size_v);
-
     v = newA(vertex, n);
     memcpy(v, pmemobj_direct(v_root), size_v);
 
 
     PMEMobjpool *offsets_pool = pmemobj_open("/pmem/ahj/offsets", "ligra-offsets");
     PMEMoid offsets_root = pmemobj_root(offsets_pool, size_offsets);
-
     offsets = newA(uintT, n);
     memcpy(offsets, pmemobj_direct(offsets_root), size_offsets);
 
