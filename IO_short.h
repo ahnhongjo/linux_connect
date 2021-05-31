@@ -169,7 +169,7 @@ graph <vertex> readGraphFromFile(char *fname) {
     PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
 
     if (!graph_data_pool) {
-        return graph_mem<vertex>(fname,graph_data_pool)
+        return graph_mem<vertex>(fname,graph_data_pool);
     }
 
     else {
@@ -232,16 +232,20 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     vertex *v = newA(vertex, n);
 
     {
+	printf("o : ");
         for (uintT i = 0; i < n; i++) {
             uintT o = offsets[i];
             uintT l = ((i == n - 1) ? m : offsets[i + 1]) - offsets[i];
             v[i].setOutDegree(l);
+	    printf(" %u ",o);
+
 #ifndef WEIGHTED
             v[i].setOutNeighbors(edges + o);
 #else
             v[i].setOutNeighbors(edges+2*o);
 #endif
         }
+	printf("\n");
     }
 
     uintT *tOffsets = newA(uintT, n);
@@ -289,6 +293,10 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
         quickSort(temp,m,pairFirstCmp<intPair>());
 #endif
 #endif
+
+    std::cout<<"sort"<<std::endl;
+    for(int i=0;i<m;i++)
+	    std::cout<<temp[i].first<<","<<temp[i].second<<std::endl;
 
     tOffsets[temp[0].first] = 0;
 #ifndef WEIGHTED
@@ -390,6 +398,18 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     PMEMoid v_root = pmemobj_root(v_pool, size_v);
     pmemobj_memcpy_persist(v_pool, pmemobj_direct(v_root), v, size_v);
     pmemobj_close(v_pool);
+
+    printf("edges : ");
+    for(int i=0;i<m;i++)
+    {
+	    printf("%u ",edges[i]);
+			    }
+
+    printf("\ninEdges : ");
+    for(int i=0;i<m;i++){
+    printf("%u ",inEdges[i]);
+		    }
+		    printf("\n");
 
     Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
 
