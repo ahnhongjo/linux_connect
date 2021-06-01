@@ -249,6 +249,8 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
 
     free(offsets);
 
+
+
     intSort::iSort(temp, m, n + 1, getFirst<uintE>());
 
     std::cout<<"sort"<<std::endl;
