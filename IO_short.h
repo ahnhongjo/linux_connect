@@ -204,7 +204,6 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     uintE *edges = newA(uintE, m);
 
 
-
     for (long i = 0; i < n; i++)
         offsets[i] = atol(W.Strings[i + 3]);
 
@@ -213,18 +212,17 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
 
     vertex *v = newA(vertex, n);
 
-    {
-	printf("o : ");
-        for (uintT i = 0; i < n; i++) {
-            uintT o = offsets[i];
-            uintT l = ((i == n - 1) ? m : offsets[i + 1]) - offsets[i];
-            v[i].setOutDegree(l);
-	    printf(" %u ",o);
-	    v[i].setOutNeighbors(edges + o);
+    printf("o : ");
+    for (uintT i = 0; i < n; i++) {
+        uintT o = offsets[i];
+        uintT l = ((i == n - 1) ? m : offsets[i + 1]) - offsets[i];
+        v[i].setOutDegree(l);
+        printf(" %u ",o);
+        v[i].setOutNeighbors(edges + o);
 
-        }
-	printf("\n");
     }
+    printf("\n");
+
 
     uintT *tOffsets = newA(uintT, n);
 
@@ -233,15 +231,15 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
 
     intPair *temp = newA(intPair, m);
 
-    {
-        for (long i = 0; i < n; i++) {
-            uintT o = offsets[i];
-            for (uintT j = 0; j < v[i].getOutDegree(); j++) {
-                temp[o + j] = make_pair(v[i].getOutNeighbor(j), i);
-            }
+    for (long i = 0; i < n; i++) {
+        uintT o = offsets[i];
+        for (uintT j = 0; j < v[i].getOutDegree(); j++) {
+            temp[o + j] = make_pair(v[i].getOutNeighbor(j), i);
         }
     }
 
+
+    //pmem offsets
     size_t size_offsets = n * sizeof(uintT);
     PMEMobjpool *offsets_pool = pmemobj_create("/pmem/ahj/offsets", "ligra-offsets",
                                                size_offsets + PMEMOBJ_MIN_POOL, 0666);
@@ -252,7 +250,6 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     free(offsets);
 
     intSort::iSort(temp, m, n + 1, getFirst<uintE>());
-
 
     std::cout<<"sort"<<std::endl;
     for(int i=0;i<m;i++)
@@ -275,16 +272,17 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     //offset to the right
     sequence::scanIBack(tOffsets, tOffsets, n, minF<uintT>(), (uintT) m);
 
-    {
-        for (long i = 0; i < n; i++) {
-            uintT o = tOffsets[i];
-            uintT l = ((i == n - 1) ? m : tOffsets[i + 1]) - tOffsets[i];
-            v[i].setInDegree(l);
-            v[i].setInNeighbors(inEdges + o);
+    for (long i = 0; i < n; i++) {
+        uintT o = tOffsets[i];
+        uintT l = ((i == n - 1) ? m : tOffsets[i + 1]) - tOffsets[i];
+        v[i].setInDegree(l);
+        v[i].setInNeighbors(inEdges + o);
 
-        }
     }
 
+
+
+    //pmem toffsets
     size_t size_tOffsets = n * sizeof(uintT);
 
     PMEMobjpool *tOffsets_pool = pmemobj_create("/pmem/ahj/tOffsets", "ligra-tOffsets",
@@ -294,8 +292,9 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     pmemobj_close(tOffsets_pool);
 
     free(tOffsets);
-    //sslab: here!
 
+
+    //pmem all
     size_t size_inEdges = m * sizeof(uintE);
     size_t size_edges = m * sizeof(uintE);
     size_t size_v = n * sizeof(vertex);
@@ -344,15 +343,14 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
 
     printf("edges : ");
     for(int i=0;i<m;i++)
-    {
-	    printf("%u ",edges[i]);
-			    }
+        printf("%u ",edges[i]);
+
 
     printf("\ninEdges : ");
-    for(int i=0;i<m;i++){
-    printf("%u ",inEdges[i]);
-		    }
-		    printf("\n");
+    for(int i=0;i<m;i++)
+        printf("%u ",inEdges[i]);
+
+    printf("\n");
 
     Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
 
@@ -387,13 +385,8 @@ graph <vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
     printf("m : %lu, n : %lu, size_inEdges : %lu, size_edges : %lu, size_v : %lu\n", m, n, size_inEdges, size_edges, size_v);
 
 
-#ifndef WEIGHTED
     uintE *inEdges = newA(uintE, m);
     uintE *edges = newA(uintE, m);
-#else
-    intE* inEdges = newA(intE,2*m);
-    intE* edges = newA(intE,2*m);
-#endif
 
 
     PMEMobjpool *inEdges_pool = pmemobj_open("/pmem/ahj/inEdges", "ligra-inEdges");
