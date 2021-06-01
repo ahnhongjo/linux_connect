@@ -12,9 +12,9 @@ int init_buffer(MessageBuffer **buffer) {
     /*---------------------------------------*/
     /* TODO 1 : init buffer                  */
 
-    if((shmid=shmget(KEY,sizeof(buffer),IPC_CREAT|0666))==-1) return -1;
-    buffer[0]->in=0;
-    buffer[0]->out=0;
+    if((shmid=shmget(KEY,sizeof(MessageBuffer),IPC_CREAT|0666))==-1) return -1;
+    (*buffer)->in=0;
+    (*buffer)->out=0;
 
 
     /* TODO 1 : END                          */
@@ -29,7 +29,8 @@ int attach_buffer(MessageBuffer **buffer) {
     /* TODO 2 : attach buffer                */
     /* do not consider "no buffer situation" */
 
-    if((memory_segment=shmat(shmid,(void*)buffer,0))==(void*)-1) return -1;
+    if((memory_segment=shmat(shmid,NULL,0))==(void*)-1) return -1;
+    *buffer=(MessageBuffer*) memory_segment;
 
 
     /* TODO 2 : END                          */
@@ -75,13 +76,13 @@ int produce(MessageBuffer **buffer, int sender_id, char *data) {
     /* TODO 3 : produce message              */
     
     Message *msg;
-    msg->data=data;
+    strcpy(msg->data,data);
     msg->sender_id=sender_id;
 
-    int in=buffer[0]->in;
+    int in=(*buffer)->in;
 
-    buffer[0]->messages[in]=msg;
-    buffer[0]->in=in++;
+    memcpy((*buffer)->messages[in],msg,sizeof(Message));
+    (*buffer)->in=in++;
 
 
     /* TODO 3 : END                          */
@@ -89,6 +90,7 @@ int produce(MessageBuffer **buffer, int sender_id, char *data) {
 
     printf("produce message\n");
     return 0;
+    
 }
 
 int consume(MessageBuffer **buffer, Message **message) {
@@ -98,9 +100,10 @@ int consume(MessageBuffer **buffer, Message **message) {
 
     /*---------------------------------------*/
     /* TODO 4 : consume message              */
-    
-    int out=buffer[0]->out;
-    message=buffer[0]->messages[out];
+
+
+    int out=(*buffer)->out;
+    memcpy(message,(*buffer)->messages[out],sizeof(Message));
 
 
     /* TODO 4 : END                          */
