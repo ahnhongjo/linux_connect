@@ -186,21 +186,13 @@ namespace decode_uncompressed {
 }
 
 struct asymmetricVertex {
-#ifndef WEIGHTED
     uintE* inNeighbors, *outNeighbors;
-#else
-    intE* inNeighbors, *outNeighbors;
-#endif
+
     uintT outDegree;
     uintT inDegree;
     void del() {free(inNeighbors); free(outNeighbors);}
-#ifndef WEIGHTED
-    asymmetricVertex(uintE* iN, uintE* oN, uintT id, uintT od)
-#else
-    asymmetricVertex(intE* iN, intE* oN, uintT id, uintT od)
-#endif
-            : inNeighbors(iN), outNeighbors(oN), inDegree(id), outDegree(od) {}
-#ifndef WEIGHTED
+    asymmetricVertex(uintE* iN, uintE* oN, uintT id, uintT od): inNeighbors(iN), outNeighbors(oN), inDegree(id), outDegree(od) {}
+    
     uintE* getInNeighbors () { return inNeighbors; }
     const uintE* getInNeighbors () const { return inNeighbors; }
     uintE* getOutNeighbors () { return outNeighbors; }
@@ -209,24 +201,9 @@ struct asymmetricVertex {
     uintE getOutNeighbor(uintT j) const { return outNeighbors[j]; }
     void setInNeighbor(uintT j, uintE ngh) { inNeighbors[j] = ngh; }
     void setOutNeighbor(uintT j, uintE ngh) { outNeighbors[j] = ngh; }
-    void setInNeighextibors(uintE* _i) { inNeighbors = _i; }
+    void setInNeighbors(uintE* _i) { inNeighbors = _i; }
     void setOutNeighbors(uintE* _i) { outNeighbors = _i; }
-#else
-    intE* getInNeighbors () { return inNeighbors; }
-  const intE* getInNeighbors () const { return inNeighbors; }
-  intE* getOutNeighbors () { return outNeighbors; }
-  const intE* getOutNeighbors () const { return outNeighbors; }
-  intE getInNeighbor(uintT j) const { return inNeighbors[2*j]; }
-  intE getOutNeighbor(uintT j) const { return outNeighbors[2*j]; }
-  intE getInWeight(uintT j) const { return inNeighbors[2*j+1]; }
-  intE getOutWeight(uintT j) const { return outNeighbors[2*j+1]; }
-  void setInNeighbor(uintT j, uintE ngh) { inNeighbors[2*j] = ngh; }
-  void setOutNeighbor(uintT j, uintE ngh) { outNeighbors[2*j] = ngh; }
-  void setInWeight(uintT j, uintE wgh) { inNeighbors[2*j+1] = wgh; }
-  void setOutWeight(uintT j, uintE wgh) { outNeighbors[2*j+1] = wgh; }
-  void setInNeighbors(intE* _i) { inNeighbors = _i; }
-  void setOutNeighbors(intE* _i) { outNeighbors = _i; }
-#endif
+
 
     uintT getInDegree() const { return inDegree; }
     uintT getOutDegree() const { return outDegree; }

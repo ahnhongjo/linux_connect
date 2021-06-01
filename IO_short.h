@@ -184,11 +184,9 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     words W;
     _seq<char> S = readStringFromFile(fname);
     W = stringToWords(S.A, S.n);
-#ifndef WEIGHTED
+
     if (W.Strings[0] != (string) "AdjacencyGraph") {
-#else
-        if (W.Strings[0] != (string) "WeightedAdjacencyGraph") {
-#endif
+
         cout << "Bad input file" << endl;
         abort();
     }
@@ -196,39 +194,23 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     long len = W.m - 1;
     long n = atol(W.Strings[1]);
     long m = atol(W.Strings[2]);
-#ifndef WEIGHTED
+
     if (len != n + m + 2) {
-#else
-        if (len != n + 2*m + 2) {
-#endif
         cout << "Bad input file" << endl;
         abort();
     }
 
     uintT *offsets = newA(uintT, n);
-#ifndef WEIGHTED
     uintE *edges = newA(uintE, m);
-#else
-    intE* edges = newA(intE,2*m);
-#endif
+
 
 
     for (long i = 0; i < n; i++)
         offsets[i] = atol(W.Strings[i + 3]);
 
-    {
-        for (long i = 0; i < m; i++) {
-#ifndef WEIGHTED
-            edges[i] = atol(W.Strings[i + n + 3]);
-#else
-            edges[2*i] = atol(W.Strings[i+n+3]);
-                edges[2*i+1] = atol(W.Strings[i+n+m+3]);
-#endif
-        }
-    }
-    //W.del(); // to deal with performance bug in malloc
+    for (long i = 0; i < m; i++)
+        edges[i] = atol(W.Strings[i + n + 3]);
 
-    //sslab: here?
     vertex *v = newA(vertex, n);
 
     {
@@ -238,35 +220,24 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
             uintT l = ((i == n - 1) ? m : offsets[i + 1]) - offsets[i];
             v[i].setOutDegree(l);
 	    printf(" %u ",o);
+	    v[i].setOutNeighbors(edges + o);
 
-#ifndef WEIGHTED
-            v[i].setOutNeighbors(edges + o);
-#else
-            v[i].setOutNeighbors(edges+2*o);
-#endif
         }
 	printf("\n");
     }
 
     uintT *tOffsets = newA(uintT, n);
-    {
-        for (long i = 0; i < n; i++)
-            tOffsets[i] = INT_T_MAX;
-    }
-#ifndef WEIGHTED
+
+    for (long i = 0; i < n; i++)
+        tOffsets[i] = INT_T_MAX;
+
     intPair *temp = newA(intPair, m);
-#else
-    intTriple* temp = newA(intTriple,m);
-#endif
+
     {
         for (long i = 0; i < n; i++) {
             uintT o = offsets[i];
             for (uintT j = 0; j < v[i].getOutDegree(); j++) {
-#ifndef WEIGHTED
                 temp[o + j] = make_pair(v[i].getOutNeighbor(j), i);
-#else
-                temp[o+j] = make_pair(v[i].getOutNeighbor(j),make_pair(i,v[i].getOutWeight(j)));
-#endif
             }
         }
     }
@@ -280,46 +251,21 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
 
     free(offsets);
 
-#ifndef WEIGHTED
-#ifndef LOWMEM
     intSort::iSort(temp, m, n + 1, getFirst<uintE>());
-#else
-    quickSort(temp,m,pairFirstCmp<uintE>());
-#endif
-#else
-    #ifndef LOWMEM
-        intSort::iSort(temp,m,n+1,getFirst<intPair>());
-#else
-        quickSort(temp,m,pairFirstCmp<intPair>());
-#endif
-#endif
+
 
     std::cout<<"sort"<<std::endl;
     for(int i=0;i<m;i++)
 	    std::cout<<temp[i].first<<","<<temp[i].second<<std::endl;
 
     tOffsets[temp[0].first] = 0;
-#ifndef WEIGHTED
-    //sslab: here!
     uintE *inEdges = newA(uintE, m);
-    //printf("sizeof inEdges: %ld, m: %d\n", m * sizeof(uintE), m);
     inEdges[0] = temp[0].second;
-#else
-    intE* inEdges = newA(intE,2*m);
-        inEdges[0] = temp[0].second.first;
-        inEdges[1] = temp[0].second.second;
-#endif
-    {
-        for (long i = 1; i < m; i++) {
-#ifndef WEIGHTED
-            inEdges[i] = temp[i].second;
-#else
-            inEdges[2*i] = temp[i].second.first;
-    inEdges[2*i+1] = temp[i].second.second;
-#endif
-            if (temp[i].first != temp[i - 1].first) {
-                tOffsets[temp[i].first] = i;
-            }
+    for (long i = 1; i < m; i++) {
+        inEdges[i] = temp[i].second;
+
+        if (temp[i].first != temp[i - 1].first) {
+            tOffsets[temp[i].first] = i;
         }
     }
 
@@ -334,11 +280,8 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
             uintT o = tOffsets[i];
             uintT l = ((i == n - 1) ? m : tOffsets[i + 1]) - tOffsets[i];
             v[i].setInDegree(l);
-#ifndef WEIGHTED
             v[i].setInNeighbors(inEdges + o);
-#else
-            v[i].setInNeighbors(inEdges+2*o);
-#endif
+
         }
     }
 
@@ -441,8 +384,7 @@ graph <vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
     size_offsets = gd_now->offsets_size;
     size_tOffsets = gd_now->tOffsets_size;
 
-    printf("m : %lu, n : %lu, size_inEdges : %lu, size_edges : %lu, size_v : %lu\n", m, n, size_inEdges, size_edges,
-           size_v);
+    printf("m : %lu, n : %lu, size_inEdges : %lu, size_edges : %lu, size_v : %lu\n", m, n, size_inEdges, size_edges, size_v);
 
 
 #ifndef WEIGHTED
