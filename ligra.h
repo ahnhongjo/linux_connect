@@ -83,7 +83,7 @@ vertexSubsetData<data> edgeMapDense(graph GA, VS& vertexSubset, F &f, const flag
   }
 }
 
-template <class data, class vertex, class VS, class F>
+template <class data, class VS, class F>
 vertexSubsetData<data> edgeMapDenseForward(graph GA, VS& vertexSubset, F &f, const flags fl) {
   using D = tuple<bool, data>;
   long n = GA.n;
@@ -109,7 +109,7 @@ vertexSubsetData<data> edgeMapDenseForward(graph GA, VS& vertexSubset, F &f, con
   }
 }
 
-template <class data, class vertex, class VS, class F>
+template <class data, class VS, class F>
 vertexSubsetData<data> edgeMapSparse(graph& GA, asymmetricVertex* frontierVertices, VS& indices,
         uintT* degrees, uintT m, F &f, const flags fl) {
   using S = tuple<uintE, data>;
@@ -155,7 +155,7 @@ vertexSubsetData<data> edgeMapSparse(graph& GA, asymmetricVertex* frontierVertic
   }
 }
 
-template <class data, class vertex, class VS, class F>
+template <class data, class VS, class F>
 vertexSubsetData<data> edgeMapSparse_no_filter(graph& GA,
     asymmetricVertex* frontierVertices, VS& indices, uintT* offsets, uintT m, F& f,
     const flags fl) {
