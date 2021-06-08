@@ -233,7 +233,7 @@ vertexSubsetData<data> edgeMapSparse_no_filter(graph& GA,
 }
 
 // Decides on sparse or dense base on number of nonzeros in the active vertices.
-template <class data, class vertex, class VS, class F>
+template <class data, class VS, class F>
 vertexSubsetData<data> edgeMapData(graph& GA, VS &vs, F f,
     intT threshold = -1, const flags& fl=0) {
   long numVertices = GA.n, numEdges = GA.m, m = vs.numNonzeros();
@@ -473,7 +473,7 @@ int parallel_main(int argc, char* argv[]) {
   commandLine P(argc,argv," [-s] <inFile>");
   char* iFile = P.getArgument(0);
   long rounds = P.getOptionLongValue("-rounds",3);
-  graph G = readGraphFromFile<asymmetricVertex>(iFile); //asymmetric graph
+  graph G = readGraphFromFile(iFile); //asymmetric graph
     Compute(G);
     if(G.transposed) G.transpose();
     for(int r=0;r<rounds;r++) {

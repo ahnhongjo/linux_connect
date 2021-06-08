@@ -166,11 +166,11 @@ graph readGraphFromFile(char *fname) {
     PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
 
     if (!graph_data_pool) {
-        return graph_mem<asymmetricVertex>(fname,graph_data_pool);
+        return graph_mem(fname,graph_data_pool);
     }
 
     else {
-        return graph_pmem<asymmetricVertex>(graph_data_pool);
+        return graph_pmem(graph_data_pool);
     }
 }
 
@@ -350,12 +350,12 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
 
     printf("\n");
 
-    Uncompressed_Mem <asymmetricVertex> *mem = new Uncompressed_Mem<asymmetricVertex>(v, n, m, edges, inEdges);
+    Uncompressed_Mem *mem = new Uncompressed_Mem(v, n, m, edges, inEdges);
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
     std::cout << "load time: " << sec.count() << std::endl;
 
-    return graph<asymmetricVertex>(v, n, m, mem);
+    return graph(v, n, m, mem);
 
 }
 
