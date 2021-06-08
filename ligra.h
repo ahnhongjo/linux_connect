@@ -57,11 +57,11 @@ const flags no_dense = 64;
 const flags edge_parallel = 128;
 inline bool should_output(const flags& fl) { return !(fl & no_output); }
 
-template <class data, class vertex, class VS, class F>
-vertexSubsetData<data> edgeMapDense(graph<vertex> GA, VS& vertexSubset, F &f, const flags fl) {
+template <class data, class VS, class F>
+vertexSubsetData<data> edgeMapDense(graph GA, VS& vertexSubset, F &f, const flags fl) {
   using D = tuple<bool, data>;
   long n = GA.n;
-  vertex *G = GA.V;
+    asymmetricVertex *G = GA.V;
   if (should_output(fl)) {
     D* next = newA(D, n);
     auto g = get_emdense_gen<data>(next);
@@ -84,10 +84,10 @@ vertexSubsetData<data> edgeMapDense(graph<vertex> GA, VS& vertexSubset, F &f, co
 }
 
 template <class data, class vertex, class VS, class F>
-vertexSubsetData<data> edgeMapDenseForward(graph<vertex> GA, VS& vertexSubset, F &f, const flags fl) {
+vertexSubsetData<data> edgeMapDenseForward(graph GA, VS& vertexSubset, F &f, const flags fl) {
   using D = tuple<bool, data>;
   long n = GA.n;
-  vertex *G = GA.V;
+    asymmetricVertex *G = GA.V;
   if (should_output(fl)) {
     D* next = newA(D, n);
     auto g = get_emdense_forward_gen<data>(next);
@@ -110,7 +110,7 @@ vertexSubsetData<data> edgeMapDenseForward(graph<vertex> GA, VS& vertexSubset, F
 }
 
 template <class data, class vertex, class VS, class F>
-vertexSubsetData<data> edgeMapSparse(graph<vertex>& GA, vertex* frontierVertices, VS& indices,
+vertexSubsetData<data> edgeMapSparse(graph& GA, asymmetricVertex* frontierVertices, VS& indices,
         uintT* degrees, uintT m, F &f, const flags fl) {
   using S = tuple<uintE, data>;
   long n = indices.n;
@@ -124,14 +124,14 @@ vertexSubsetData<data> edgeMapSparse(graph<vertex>& GA, vertex* frontierVertices
     auto g = get_emsparse_gen<data>(outEdges);
     parallel_for (size_t i = 0; i < m; i++) {
       uintT v = indices.vtx(i), o = offsets[i];
-      vertex vert = frontierVertices[i];
+      asymmetricVertex vert = frontierVertices[i];
       vert.decodeOutNghSparse(v, o, f, g);
     }
   } else {
     auto g = get_emsparse_nooutput_gen<data>();
     parallel_for (size_t i = 0; i < m; i++) {
       uintT v = indices.vtx(i);
-      vertex vert = frontierVertices[i];
+      asymmetricVertex vert = frontierVertices[i];
       vert.decodeOutNghSparse(v, 0, f, g);
     }
   }
@@ -156,8 +156,8 @@ vertexSubsetData<data> edgeMapSparse(graph<vertex>& GA, vertex* frontierVertices
 }
 
 template <class data, class vertex, class VS, class F>
-vertexSubsetData<data> edgeMapSparse_no_filter(graph<vertex>& GA,
-    vertex* frontierVertices, VS& indices, uintT* offsets, uintT m, F& f,
+vertexSubsetData<data> edgeMapSparse_no_filter(graph& GA,
+    asymmetricVertex* frontierVertices, VS& indices, uintT* offsets, uintT m, F& f,
     const flags fl) {
   using S = tuple<uintE, data>;
   long n = indices.n;
@@ -234,26 +234,26 @@ vertexSubsetData<data> edgeMapSparse_no_filter(graph<vertex>& GA,
 
 // Decides on sparse or dense base on number of nonzeros in the active vertices.
 template <class data, class vertex, class VS, class F>
-vertexSubsetData<data> edgeMapData(graph<vertex>& GA, VS &vs, F f,
+vertexSubsetData<data> edgeMapData(graph& GA, VS &vs, F f,
     intT threshold = -1, const flags& fl=0) {
   long numVertices = GA.n, numEdges = GA.m, m = vs.numNonzeros();
   if(threshold == -1) threshold = numEdges/20; //default threshold
-  vertex *G = GA.V;
+    asymmetricVertex *G = GA.V;
   if (numVertices != vs.numRows()) {
     cout << "edgeMap: Sizes Don't match" << endl;
     abort();
   }
   if (m == 0) return vertexSubsetData<data>(numVertices);
   uintT* degrees = NULL;
-  vertex* frontierVertices = NULL;
+    asymmetricVertex* frontierVertices = NULL;
   uintT outDegrees = 0;
   if(threshold > 0) { //compute sum of out-degrees if threshold > 0
     vs.toSparse();
     degrees = newA(uintT, m);
-    frontierVertices = newA(vertex,m);
+    frontierVertices = newA(asymmetricVertex,m);
     {parallel_for (size_t i=0; i < m; i++) {
 	uintE v_id = vs.vtx(i);
-	vertex v = G[v_id];
+    asymmetricVertex v = G[v_id];
 	degrees[i] = v.getOutDegree();
 	frontierVertices[i] = v;
       }}
@@ -265,21 +265,21 @@ vertexSubsetData<data> edgeMapData(graph<vertex>& GA, VS &vs, F f,
     if(frontierVertices) free(frontierVertices);
     vs.toDense();
     return (fl & dense_forward) ?
-      edgeMapDenseForward<data, vertex, VS, F>(GA, vs, f, fl) :
-      edgeMapDense<data, vertex, VS, F>(GA, vs, f, fl);
+      edgeMapDenseForward<data, VS, F>(GA, vs, f, fl) :
+      edgeMapDense<data, VS, F>(GA, vs, f, fl);
   } else {
     auto vs_out =
       (should_output(fl) && fl & sparse_no_filter) ? // only call snof when we output
-      edgeMapSparse_no_filter<data, vertex, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl) :
-      edgeMapSparse<data, vertex, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl);
+      edgeMapSparse_no_filter<data, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl) :
+      edgeMapSparse<data, VS, F>(GA, frontierVertices, vs, degrees, vs.numNonzeros(), f, fl);
     free(degrees); free(frontierVertices);
     return vs_out;
   }
 }
 
 // Regular edgeMap, where no extra data is stored per vertex.
-template <class vertex, class VS, class F>
-vertexSubset edgeMap(graph<vertex>& GA, VS& vs, F f,
+template <class VS, class F>
+vertexSubset edgeMap(graph& GA, VS& vs, F f,
     intT threshold = -1, const flags& fl=0) {
   return edgeMapData<pbbs::empty>(GA, vs, f, threshold, fl);
 }
@@ -287,11 +287,11 @@ vertexSubset edgeMap(graph<vertex>& GA, VS& vs, F f,
 // Packs out the adjacency lists of all vertex in vs. A neighbor, ngh, is kept
 // in the new adjacency list if p(ngh) is true.
 // Weighted graphs are not yet supported, but this should be easy to do.
-template <class vertex, class P>
-vertexSubsetData<uintE> packEdges(graph<vertex>& GA, vertexSubset& vs, P& p, const flags& fl=0) {
+template <class P>
+vertexSubsetData<uintE> packEdges(graph& GA, vertexSubset& vs, P& p, const flags& fl=0) {
   using S = tuple<uintE, uintE>;
   vs.toSparse();
-  vertex* G = GA.V; long m = vs.numNonzeros(); long n = vs.numRows();
+  asymmetricVertex* G = GA.V; long m = vs.numNonzeros(); long n = vs.numRows();
   if (vs.size() == 0) {
     return vertexSubsetData<uintE>(n);
   }
@@ -335,13 +335,13 @@ vertexSubsetData<uintE> packEdges(graph<vertex>& GA, vertexSubset& vs, P& p, con
   }
 }
 
-template <class vertex, class P>
-vertexSubsetData<uintE> edgeMapFilter(graph<vertex>& GA, vertexSubset& vs, P& p, const flags& fl=0) {
+template <class P>
+vertexSubsetData<uintE> edgeMapFilter(graph& GA, vertexSubset& vs, P& p, const flags& fl=0) {
   vs.toSparse();
   if (fl & pack_edges) {
-    return packEdges<vertex, P>(GA, vs, p, fl);
+    return packEdges<P>(GA, vs, p, fl);
   }
-  vertex* G = GA.V; long m = vs.numNonzeros(); long n = vs.numRows();
+    asymmetricVertex* G = GA.V; long m = vs.numNonzeros(); long n = vs.numRows();
   using S = tuple<uintE, uintE>;
   if (vs.size() == 0) {
     return vertexSubsetData<uintE>(n);
@@ -465,11 +465,9 @@ vertexSubset vertexFilter2(vertexSubsetData<data> V, F filter) {
 //cond function that always returns true
 inline bool cond_true (intT d) { return 1; }
 
-template<class vertex>
-void Compute(graph<vertex>&, commandLine);
+void Compute(graph&);
 
-template<class vertex>
-void Compute(hypergraph<vertex>&, commandLine);
+void Compute(hypergraph&);
 
 int parallel_main(int argc, char* argv[]) {
   commandLine P(argc,argv," [-s] <inFile>");
@@ -480,7 +478,7 @@ int parallel_main(int argc, char* argv[]) {
     if(G.transposed) G.transpose();
     for(int r=0;r<rounds;r++) {
         startTime();
-        Compute(G,P);
+        Compute(G);
         nextTime("Running time");
         if(G.transposed) G.transpose();
     }
