@@ -84,6 +84,25 @@ struct graph_data {
     long n;
 };
 
+int compare(const void* a,const void* b){
+    int *num1=(int*)a;
+    int *num2 =(int*)b;
+
+    if (a[0]>b[0])
+        return 1;
+    else if(a[0]<b[0])
+        return -1;
+    else{
+        if(a[1]>b[1])
+            return 1;
+        else if(a[1]<b[1])
+            return -1;
+        else
+            return 0;
+    }
+
+}
+
 // A structure that keeps a sequence of strings all allocated from
 // the same block of memory
 struct words {
@@ -232,14 +251,9 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
         for (uintT j = 0; j < v[i].getOutDegree(); j++) {
             temp[o + j]=newA(int,2);
             temp[o + j][0] =v[i].getOutNeighbor(j);
-            temp[o + j][1]=make_pair(, i);
-
-            std::cout<<temp[o+j][0]<<" , "<<temp[o+j][1];
+            temp[o + j][1]=i;
         }
     }
-    
-    exit(1);
-
 
     //pmem offsets
     size_t size_offsets = n * sizeof(uintT);
@@ -252,7 +266,14 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     free(offsets);
 
 
-    intSort::iSort(temp, m, n + 1, getFirst<uintE>());
+    for(int i=0;i<m;i++)
+        printf("%d , %d\n",temp[i][0],temp[i][1]);
+    //intSort::iSort(temp, m, n + 1, getFirst<uintE>());
+    qsort(temp,m,sizeof(temp[0]),compare);
+
+    for(int i=0;i<m;i++)
+        printf("%d , %d\n",temp[i][0],temp[i][1]);
+
 
     std::cout<<"sort"<<std::endl;
     for(int i=0;i<m;i++)
