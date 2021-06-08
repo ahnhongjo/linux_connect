@@ -465,23 +465,22 @@ vertexSubset vertexFilter2(vertexSubsetData<data> V, F filter) {
 //cond function that always returns true
 inline bool cond_true (intT d) { return 1; }
 
-void Compute(graph&);
-
-void Compute(hypergraph&);
+void Compute(graph& g);
 
 int parallel_main(int argc, char* argv[]) {
-  commandLine P(argc,argv," [-s] <inFile>");
-  char* iFile = P.getArgument(0);
-  long rounds = P.getOptionLongValue("-rounds",3);
+  char* iFile = argv[1];
+  long rounds=3;
+
   graph G = readGraphFromFile(iFile); //asymmetric graph
-    Compute(G);
-    if(G.transposed) G.transpose();
-    for(int r=0;r<rounds;r++) {
-        startTime();
-        Compute(G);
-        nextTime("Running time");
-        if(G.transposed) G.transpose();
+  Compute(G);
+  if(G.transposed) G.transpose();
+  for(int r=0;r<rounds;r++) {
+      startTime();
+      Compute(G);
+      nextTime("Running time");
+      if(G.transposed) G.transpose();
     }
     G.del();
+
 }
 #endif

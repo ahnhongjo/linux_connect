@@ -225,14 +225,20 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     for (long i = 0; i < n; i++)
         tOffsets[i] = INT_T_MAX;
 
-    intPair *temp = newA(intPair, m);
+    int[][] *temp = newA(int*, m);
 
     for (long i = 0; i < n; i++) {
         uintT o = offsets[i];
         for (uintT j = 0; j < v[i].getOutDegree(); j++) {
-            temp[o + j] = make_pair(v[i].getOutNeighbor(j), i);
+            temp[o + j]=newA(int,2);
+            temp[o + j][0] =v[i].getOutNeighbor(j);
+            temp[o + j][1]=make_pair(, i);
+
+            std::cout<<temp[o+j][0]<<" , "<<temp[o+j][1];
         }
     }
+    
+    exit(1);
 
 
     //pmem offsets
@@ -244,7 +250,6 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     pmemobj_close(offsets_pool);
 
     free(offsets);
-
 
 
     intSort::iSort(temp, m, n + 1, getFirst<uintE>());
@@ -277,7 +282,6 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
         v[i].setInNeighbors(inEdges + o);
 
     }
-
 
 
     //pmem toffsets
