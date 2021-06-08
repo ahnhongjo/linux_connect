@@ -272,21 +272,16 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     pmemobj_close(offsets_pool);
 
     free(offsets);
+    
 
-
-
-    std::cout<<"sort"<<std::endl;
-    for(int i=0;i<m;i++)
-	    std::cout<<temp[i].first<<","<<temp[i].second<<std::endl;
-
-    tOffsets[temp[0].first] = 0;
+    tOffsets[temp[0][0]] = 0;
     uintE *inEdges = newA(uintE, m);
-    inEdges[0] = temp[0].second;
+    inEdges[0] = temp[0][1];
     for (long i = 1; i < m; i++) {
-        inEdges[i] = temp[i].second;
+        inEdges[i] = temp[i][1];
 
-        if (temp[i].first != temp[i - 1].first) {
-            tOffsets[temp[i].first] = i;
+        if (temp[i][0] != temp[i - 1][0]) {
+            tOffsets[temp[i][0]] = i;
         }
     }
 
