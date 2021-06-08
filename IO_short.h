@@ -255,6 +255,14 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
         }
     }
 
+    for(int i=0;i<m;i++)
+        printf("%d , %d\n",temp[i][0],temp[i][1]);
+    //intSort::iSort(temp, m, n + 1, getFirst<uintE>());
+    qsort(temp,m,sizeof(temp[0]),compare);
+
+    for(int i=0;i<m;i++)
+        printf("%d , %d\n",temp[i][0],temp[i][1]);
+
     //pmem offsets
     size_t size_offsets = n * sizeof(uintT);
     PMEMobjpool *offsets_pool = pmemobj_create("/pmem/ahj/offsets", "ligra-offsets",
@@ -265,14 +273,6 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
 
     free(offsets);
 
-
-    for(int i=0;i<m;i++)
-        printf("%d , %d\n",temp[i][0],temp[i][1]);
-    //intSort::iSort(temp, m, n + 1, getFirst<uintE>());
-    qsort(temp,m,sizeof(temp[0]),compare);
-
-    for(int i=0;i<m;i++)
-        printf("%d , %d\n",temp[i][0],temp[i][1]);
 
 
     std::cout<<"sort"<<std::endl;
