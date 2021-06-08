@@ -88,14 +88,14 @@ int compare(const void* a,const void* b){
     int *num1=(int*)a;
     int *num2 =(int*)b;
 
-    if (a[0]>b[0])
+    if (num1[0]>num2[0])
         return 1;
-    else if(a[0]<b[0])
+    else if(num1[0]<num2[0])
         return -1;
     else{
-        if(a[1]>b[1])
+        if(num1[1]>num2[1])
             return 1;
-        else if(a[1]<b[1])
+        else if(num1[1]<num2[1])
             return -1;
         else
             return 0;
@@ -244,7 +244,7 @@ graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     for (long i = 0; i < n; i++)
         tOffsets[i] = INT_T_MAX;
 
-    int[][] *temp = newA(int*, m);
+    int** temp = newA(int*, m);
 
     for (long i = 0; i < n; i++) {
         uintT o = offsets[i];
