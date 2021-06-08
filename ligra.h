@@ -475,8 +475,8 @@ int parallel_main(int argc, char* argv[]) {
   commandLine P(argc,argv," [-s] <inFile>");
   char* iFile = P.getArgument(0);
   long rounds = P.getOptionLongValue("-rounds",3);
-  graph<asymmetricVertex> G = readGraphFromFile<asymmetricVertex>(iFile); //asymmetric graph
-    Compute(G,P);
+  graph G = readGraphFromFile<asymmetricVertex>(iFile); //asymmetric graph
+    Compute(G);
     if(G.transposed) G.transpose();
     for(int r=0;r<rounds;r++) {
         startTime();

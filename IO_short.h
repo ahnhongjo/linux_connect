@@ -102,11 +102,9 @@ struct words {
     }
 };
 
-template<class vertex>
-graph <vertex> graph_pmem(PMEMobjpool *graph_data_pool);
+graph graph_pmem(PMEMobjpool *graph_data_pool);
 
-template<class vertex>
-graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool);
+graph graph_mem(char* fname, PMEMobjpool *graph_data_pool);
 
 inline bool isSpace(char c) {
     switch (c) {
@@ -163,22 +161,20 @@ words stringToWords(char *Str, long n) {
     return words(Str, n, SA, m);
 }
 
-template<class vertex>
-graph <vertex> readGraphFromFile(char *fname) {
+graph readGraphFromFile(char *fname) {
 
     PMEMobjpool *graph_data_pool = pmemobj_open("/pmem/ahj/graph_data", "ligra-graph_data");
 
     if (!graph_data_pool) {
-        return graph_mem<vertex>(fname,graph_data_pool);
+        return graph_mem<asymmetricVertex>(fname,graph_data_pool);
     }
 
     else {
-        return graph_pmem<vertex>(graph_data_pool);
+        return graph_pmem<asymmetricVertex>(graph_data_pool);
     }
 }
 
-template<class vertex>
-graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
+graph graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     words W;
@@ -210,7 +206,7 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     for (long i = 0; i < m; i++)
         edges[i] = atol(W.Strings[i + n + 3]);
 
-    vertex *v = newA(vertex, n);
+    asymmetricVertex *v = newA(asymmetricVertex, n);
 
     printf("o : ");
     for (uintT i = 0; i < n; i++) {
@@ -299,7 +295,7 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
     //pmem all
     size_t size_inEdges = m * sizeof(uintE);
     size_t size_edges = m * sizeof(uintE);
-    size_t size_v = n * sizeof(vertex);
+    size_t size_v = n * sizeof(asymmetricVertex);
 
 
     printf("%lu %lu %lu %lu %lu\n", m, n, size_inEdges, size_edges, size_v);
@@ -354,22 +350,21 @@ graph <vertex> graph_mem(char* fname, PMEMobjpool *graph_data_pool){
 
     printf("\n");
 
-    Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
+    Uncompressed_Mem <asymmetricVertex> *mem = new Uncompressed_Mem<asymmetricVertex>(v, n, m, edges, inEdges);
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
     std::cout << "load time: " << sec.count() << std::endl;
 
-    return graph<vertex>(v, n, m, mem);
+    return graph<asymmetricVertex>(v, n, m, mem);
 
 }
 
-template<class vertex>
-graph <vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
+graph graph_pmem(PMEMobjpool *graph_data_pool) {
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
     long m, n;
     size_t size_inEdges, size_edges, size_v, size_offsets, size_tOffsets;
-    vertex *v;
+    asymmetricVertex *v;
     uintT *tOffsets;
     uintT *offsets;
 
@@ -403,7 +398,7 @@ graph <vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
 
     PMEMobjpool *v_pool = pmemobj_open("/pmem/ahj/v", "ligra-v");
     PMEMoid v_root = pmemobj_root(v_pool, size_v);
-    v = newA(vertex, n);
+    v = newA(asymmetricVertex, n);
     memcpy(v, pmemobj_direct(v_root), size_v);
 
 
@@ -426,12 +421,12 @@ graph <vertex> graph_pmem(PMEMobjpool *graph_data_pool) {
         v[i].setInNeighbors(inEdges + o2);
     }
 
-    Uncompressed_Mem <vertex> *mem = new Uncompressed_Mem<vertex>(v, n, m, edges, inEdges);
+    Uncompressed_Mem *mem = new Uncompressed_Mem(v, n, m, edges, inEdges);
 
     std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
     std::cout << "load time: " << sec.count() << std::endl;
 
-    return graph<vertex>(v, n, m, mem);
+    return graph(v, n, m, mem);
 
 }
 
